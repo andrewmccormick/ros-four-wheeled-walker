@@ -13,4 +13,6 @@
 
   <include file="$(find simplified)/launch/joint_controllers.launch"></include>
 
+  <node name="base_controller1" pkg="simplified" type="base_controller" output="screen"> </node>
+
 </launch>
