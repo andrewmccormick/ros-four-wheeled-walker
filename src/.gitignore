@@ -1,0 +1,15 @@
+#ignore library folders that aren't actually ours
+find-object/*
+hectorquad/*
+hector_slam/*
+iai_kinect2/*
+maskor_navigation/*
+rtabmap_ros/*
+scan_tools/*
+slam_gmapping/*
+teb_local_planner_tutorials/*
+teleop_twist_keyboard/*
+walkerOld/*
+
+#ignore temp files
+*~
