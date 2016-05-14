@@ -1,7 +1,6 @@
-#include "ros/ros.h"
+#include <ros/ros.h>
 #include "std_msgs/Float64.h"
 #include "geometry_msgs/Twist.h"
-#include <ros/ros.h>
 #include <cmath>
 
 class SubscribeAndPublish
@@ -10,10 +9,10 @@ public:
   SubscribeAndPublish()
   {
     //Topic you want to publish
-   right_spin_ = n_.advertise<std_msgs::Float64>("/walkernew/right_spinning_wheel_controller/command", 1000);
-	 left_spin_= n_.advertise<std_msgs::Float64>("/walkernew/left_spinning_wheel_controller/command", 1000);
-   right_turn_ = n_.advertise<std_msgs::Float64>("/walkernew/right_turning_wheel_controller/command", 1000);
-   left_turn_ = n_.advertise<std_msgs::Float64>("/walkernew/left_turning_wheel_controller/command", 1000);
+    left_spin_= n_.advertise<std_msgs::Float64>("/walkernew/left_spinning_wheel_controller/command", 1000);
+    right_spin_ = n_.advertise<std_msgs::Float64>("/walkernew/right_spinning_wheel_controller/command", 1000);
+    left_turn_ = n_.advertise<std_msgs::Float64>("/walkernew/left_turning_wheel_controller/command", 1000);
+    right_turn_ = n_.advertise<std_msgs::Float64>("/walkernew/right_turning_wheel_controller/command", 1000);
     //Topic you want to subscribe
     sub_ = n_.subscribe("/cmd_vel", 1000, &SubscribeAndPublish::callback, this);
   }
@@ -21,9 +20,12 @@ public:
   void callback(const geometry_msgs::Twist& twist)
   {
   
-    std_msgs::Float64 linearSpeed;
-    std_msgs::Float64 turnAngle;
-
+    std_msgs::Float64 leftLinearSpeed;
+    std_msgs::Float64 leftTurnAngle;
+    
+    std_msgs::Float64 rightLinearSpeed;
+    std_msgs::Float64 rightTurnAngle;
+    
     /* We supply the controllers the speeds of the front wheels with the (negated*) angular velocity
        *negated, since for whatever reason the controller/orientation of joints works out this way 
         TODO: evaluate whether to flip controller to take positive angular velocity, then remove negation here
@@ -44,12 +46,15 @@ public:
       WHEEL_RADIUS, WHEEL_BASE, REAR_TRACK, FRONT_TRACK, twist.linear.x, twist.angular.z,
       &frontRightAngularSpeed, &frontRightAngle, &frontLeftAngularSpeed, &frontLeftAngle
       );
-  
+     leftLinearSpeed.data = -1.0 * frontLeftAngularSpeed; 
+     leftTurnAngle.data = frontLeftAngle;    			 
+     rightLinearSpeed.data = -1.0 * frontRightAngularSpeed;
+     rightTurnAngle.data = frontRightAngle;
     //Note: Controllers actually take the inverse of angular speed for wheel turning
-  	left_spin_.publish(-1*frontLeftAngularSpeed);
-  	left_turn_.publish(frontLeftAngle);	
-    right_spin_.publish(-1*frontRightAngularSpeed);
-    right_turn_.publish(frontRightAngle);
+    left_spin_.publish(leftLinearSpeed);
+    left_turn_.publish(leftTurnAngle);	
+    right_spin_.publish(rightLinearSpeed);
+    right_turn_.publish(rightTurnAngle);
   }
 
 private:
@@ -98,34 +103,6 @@ private:
           (*frontLeftAngle) += M_PI;
           (*frontRightAngle) += M_PI;
         }
-          // *frontLeftAngle = angularVelocity;
-          // *frontRightAngle = angularVelocity;
-
-    // if(abs(angularVelocity) > MINIMUM_TURN_TOLERANCE) {
-
-    //   double horizontalDistance_centreOfCurvatureToFrontLeft = (radiusOfCurvatureOfPath - 0.5 * frontTrack),
-    //          horizontalDistance_centreOfCurvatureToFrontRight = (radiusOfCurvatureOfPath + 0.5 * frontTrack);
-
-    //   *frontLeftAngle = atan(wheelBase / horizontalDistance_centreOfCurvatureToFrontLeft);
-    //   *frontRightAngle = atan(wheelBase / horizontalDistance_centreOfCurvatureToFrontRight);
-
-    //   if(velocity < 0) {
-    //     (*frontLeftAngle) += M_PI;
-    //     (*frontRightAngle) += M_PI;
-    //   }
-
-    //   double distance_centreOfCurvatureToFrontLeft = sqrt(horizontalDistance_centreOfCurvatureToFrontLeft*horizontalDistance_centreOfCurvatureToFrontLeft + wheelBase*wheelBase);
-    //   double distance_centreOfCurvatureToFrontRight = sqrt(horizontalDistance_centreOfCurvatureToFrontRight*horizontalDistance_centreOfCurvatureToFrontRight + wheelBase*wheelBase);
-
-    //   //                                    speed of wheel centre over ground           / wheel radius = angular velocity of wheel
-    //   *frontLeftAngularSpeed = abs(distance_centreOfCurvatureToFrontLeft * angularVelocity) / wheelRadius;
-    //   *frontRightAngularSpeed = abs(distance_centreOfCurvatureToFrontRight * angularVelocity) / wheelRadius;      
-    // } else {
-    //     *frontLeftAngle = 0;
-    //     *frontRightAngle = 0;
-    //     *frontLeftAngularSpeed = velocity / wheelRadius;
-    //     *frontRightAngularSpeed = velocity / wheelRadius;
-    // }
   }
 
   ros::NodeHandle n_; 
@@ -138,7 +115,6 @@ private:
 
 int main(int argc, char **argv)
 {
-
     ros::init(argc, argv, "base_controller");
     SubscribeAndPublish object;
     ros::spin();
