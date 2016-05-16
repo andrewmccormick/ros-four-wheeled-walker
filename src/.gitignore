@@ -13,3 +13,5 @@ walkerOld/*
 walkernew/*
 #ignore temp files
 *~
+CMakeLists.txt
+robot_localization/*
