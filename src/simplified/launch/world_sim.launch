@@ -17,7 +17,7 @@
   </include>
   
   <!-- push robot_description to factory and spawn robot in gazebo-->
-  <param name="robot_description" command="$(find xacro)/xacro.py '$(find simplified)/solidModel.urdf.xacro'" />
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find simplified)/configs/solidModel.urdf.xacro'" />
 
   <!-- Issue command to gazebo to spawn the walker model, at 
 	position (0, 0, 0), orientation (0, 0, 0) -->

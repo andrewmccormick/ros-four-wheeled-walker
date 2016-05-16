@@ -10,6 +10,6 @@ slam_gmapping/*
 teb_local_planner_tutorials/*
 teleop_twist_keyboard/*
 walkerOld/*
-
+walkernew/*
 #ignore temp files
 *~
