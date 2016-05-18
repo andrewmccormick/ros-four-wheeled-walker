@@ -29,7 +29,7 @@ private:
 
 	std::vector<TimeStampedTick> leftWheelVector;
 	std::vector<TimeStampedTick> rightWheelVector;
-    double computeVelocity(std::vector<TimeStampedTick>* v);
+        double computeVelocity(std::vector<TimeStampedTick>* v);
 
 	int ticksPerRotation;
 	double wheelRadius;
@@ -39,18 +39,24 @@ private:
 EncoderOdometry::EncoderOdometry()
 {
 	std::string leftWheelTopic, rightWheelTopic;
-	if(!nodeHandle.getParam("leftWheelTopic", leftWheelTopic))
-		leftWheelTopic = "walkernew/rearLeftEncoder"; 
-	if(!nodeHandle.getParam("rightWheelTopic", rightWheelTopic))
-		rightWheelTopic = "walkernew/rearRightEncoder"; 
+    if(!nodeHandle.getParam("leftWheelTopic", leftWheelTopic))
+        leftWheelTopic = "walkernew/rearLeftEncoder"; 
+    if(!nodeHandle.getParam("rightWheelTopic", rightWheelTopic))
+        rightWheelTopic = "walkernew/rearRightEncoder"; 
 
-	if(!nodeHandle.getParam("wheelRadius", wheelRadius))
-		wheelRadius = 0.2413;
-	if(!nodeHandle.getParam("rearTrack", rearTrack))
-		rearTrack = 0.5;
-	if(!nodeHandle.getParam("ticksPerRotation", ticksPerRotation))
-		ticksPerRotation = 400;
-
+    if(!nodeHandle.getParam("wheelRadius", wheelRadius)){
+        wheelRadius = 0.2413;
+        ROS_INFO("Wheel Radius = 0.2413");
+    }
+	if(!nodeHandle.getParam("rearTrack", rearTrack)) {
+        rearTrack = 0.5;                
+		ROS_INFO("Rear Track = 0.5");
+    }
+	if(!nodeHandle.getParam("ticksPerRotation", ticksPerRotation)) {
+        ticksPerRotation = 400;
+        ROS_INFO("Ticks per Rotation = 400");
+    }
+    
 	leftWheelSubscriber = nodeHandle.subscribe(leftWheelTopic, 1000, &EncoderOdometry::leftSubCallback, this);
 	rightWheelSubscriber = nodeHandle.subscribe(rightWheelTopic, 1000, &EncoderOdometry::rightSubCallback, this);
 	odomPublisher = nodeHandle.advertise<nav_msgs::Odometry>("odom/encoder", 50);
@@ -72,16 +78,19 @@ void EncoderOdometry::rightSubCallback(const std_msgs::Int64& ticks) {
 	O(n) algorithm (least squared line of best fit)
 */
 double EncoderOdometry::computeVelocity(std::vector<TimeStampedTick>* v) {
+	if(v->size() == 0) return 0;
 	// x = time, y = ticks
 	// first: compute means
 	double xMean = 0.0;
 	double yMean = 0.0;
 	for(int i = 0; i < v->size(); i++) {
-		xMean += v->at(i).time.toSec();
-		yMean += v->at(i).ticks;
+		/* Dividing inside the loop kinda sucks, 
+		   but its better than overflow errors :D
+		   (which is to say overflow will actually happen without this sadface) 
+		*/
+		xMean += v->at(i).time.toSec() / v->size();
+		yMean += ((double)(v->at(i).ticks)) / v->size();
 	}
-	xMean /= v->size();
-	yMean /= v->size();
 
 	/*     n 
           Sum ((xi - xbar) * (yi - ybar))
@@ -96,7 +105,7 @@ double EncoderOdometry::computeVelocity(std::vector<TimeStampedTick>* v) {
     double denominator = 0.0;
 
     double xDiff, yDiff;
-    for(int i = 0.0; i < v->size(); i++) {
+    for(int i = 0; i < v->size(); i++) {
     	xDiff = v->at(i).time.toSec() - xMean;
     	yDiff = v->at(i).ticks - yMean;
     	numerator += (xDiff * yDiff);
@@ -104,8 +113,11 @@ double EncoderOdometry::computeVelocity(std::vector<TimeStampedTick>* v) {
     }
 
     /*     units of m are ticks / second, 
-    	   but we must convert to m/s       */
-    return numerator / denominator * wheelRadius / ticksPerRotation;
+    	   but we must convert to m/s     
+           we multiply by 1 rotation per n ticks (divide by ticks per rotation)
+           we multiply by distance per rotation (circumference = 2 * PI * r)
+    */
+    return numerator / denominator * 2.0 * M_PI * wheelRadius / ticksPerRotation;
 }
 
 void EncoderOdometry::periodicPublishCallback(const ros::TimerEvent& event) {
@@ -115,8 +127,9 @@ void EncoderOdometry::periodicPublishCallback(const ros::TimerEvent& event) {
 	if(lastTime == currentTime || leftWheelVector.size() == 0 || rightWheelVector.size() == 0) 
 		return;
 
-	double leftVelocity = 10 * computeVelocity(&leftWheelVector);
-	double rightVelocity = 10 * computeVelocity(&rightWheelVector);
+	double leftVelocity = computeVelocity(&leftWheelVector);
+	double rightVelocity = computeVelocity(&rightWheelVector);
+	ROS_INFO("rearLeftVelocity: %f, rearRightVelocity: %f \n", leftVelocity, rightVelocity);
 	leftWheelVector.clear();
 	rightWheelVector.clear();
 
