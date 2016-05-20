@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- roslaunch arguments -->
+  <arg name="paused" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="gui" default="true"/>
+
+  <node name="rgbd_odometry" pkg="rtabmap" type="rgbd_odometry">
+        <param name="frame_id" value="base_footprint"/>
+        <param name="publish_tf" value="false"/>
+        <param name="initial_pose" value="0 0 0 0 0 0"/>
+
+  </node>
+ 
+  <node name="robot_localization" pkg="robot_localization" type="ekf_localization_node">
+         <param name="frequency" value="20"/> 
+         <param name="two_d_mode" value="true"/> 
+         <param name="map_frame" value="map"/> 
+         <param name="odom_frame" value="odom"/> 
+         <param name="base_link_frame" value="base_footprint"/> 
+
+        <!--set world frame to odom frame, since data is subject to discrete jumps based on loop closures -->
+         <param name="world_frame" value="odom"/> 
+         
+         <!-- Specify the incoming sensors to fuse, and which topic they send data over  -->
+         <param name="odom0" value="odom/encoder"/> 
+         <param name="odom1" value="odom/visual"/> 
+         
+         <!-- Specify the configs for each of the incoming sensors to fuse -->
+         <rosparam param="odom0_config">[false, false, false,               <!-- x, y, z -->
+                                         false, false, false,               <!-- r, p, y -->
+                                         true,  true,  false,               <!-- vx, vy, vz -->
+                                         false, false, true,                <!-- vr, vp, vy -->
+                                         false, false, false]</rosparam>    <!-- ax, ay, az -->
+
+         
+         <rosparam param="odom0_config">[true,  true,  false,               <!-- x, y, z -->     
+                                         false, false, true,                <!-- r, p, y -->     
+                                         true,  true,  false,               <!-- vx, vy, vz -->  
+                                         false, false, true,                <!-- vr, vp, vy -->  
+                                         false, false, false]</rosparam>    <!-- ax, ay, az -->  
+        
+          <param name="odom0_relative" value="true"/>
+          <param name="odom1_relative" value="true"/>
+  </node>
+</launch>

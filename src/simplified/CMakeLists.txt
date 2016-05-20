@@ -50,9 +50,12 @@ target_link_libraries(wheel_encoder_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIE
 ## Declare a C++ executable
 # add_executable(walkernew_node src/walkernew_node.cpp)
 add_executable(base_controller src/base_controller.cpp)
+#add_executable(odom_simulator src/odom_simulator.cpp)
+add_executable(encoder_odometry src/encoder_odometry)
 
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(base_controller ${catkin_LIBRARIES})
+target_link_libraries(encoder_odometry ${catkin_LIBRARIES})
 
 

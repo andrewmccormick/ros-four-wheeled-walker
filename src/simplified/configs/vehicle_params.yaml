@@ -1,0 +1,6 @@
+walkernew:
+  vehicle_dimensions:
+    wheel_radius: 0.2413
+    wheel_base: 0.1524                  # distance between rear axel and front axel
+    rear_track: 0.50                    # distance between two rear wheels
+    front_track: 0.50                   # distance between two front wheels

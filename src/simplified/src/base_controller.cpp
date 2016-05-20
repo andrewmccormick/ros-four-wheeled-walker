@@ -37,8 +37,8 @@ public:
     */
     const double WHEEL_RADIUS = 0.2413;
     const double WHEEL_BASE = 6 * 0.0254;          // distance between rear axel and front axel
-    const double REAR_TRACK = 0.501675;            // distance between two rear wheels
-    const double FRONT_TRACK= 0.494083;            // distance between two front wheels
+    const double REAR_TRACK = 0.5;            // distance between two rear wheels
+    const double FRONT_TRACK= 0.5;            // distance between two front wheels
 
     //output variables, passed in as pointer, aka by reference
     double frontRightAngularSpeed, frontRightAngle, frontLeftAngularSpeed, frontLeftAngle;
@@ -79,7 +79,6 @@ private:
           (*frontRightAngularSpeed) = (fabs(velocity) / wheelRadius);
           (*frontLeftAngle) = (*frontRightAngle) = 0;
         } else {
-          ROS_INFO("Hit else statement (ie turning)\n");
           double radiusOfCurvatureOfPath = fabs(velocity) / angularVelocity;
           double horizontalDistance_centreOfCurvatureToFrontLeft  = (radiusOfCurvatureOfPath - 0.5 * frontTrack),
                  horizontalDistance_centreOfCurvatureToFrontRight = (radiusOfCurvatureOfPath + 0.5 * frontTrack);
