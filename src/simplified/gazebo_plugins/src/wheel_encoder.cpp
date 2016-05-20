@@ -10,36 +10,6 @@ GZ_REGISTER_MODEL_PLUGIN(WheelEncoderPlugin)
 WheelEncoderPlugin::WheelEncoderPlugin() {}
 WheelEncoderPlugin::~WheelEncoderPlugin() {}
 
-// bool retrieveJointName(sdf::ElementPtr _sdf, std::string& jointName) {
-// 	bool retrievedJointName = false;
-// 	sdf::ElementPtr jointNameElement = _sdf->GetElement("joint_name");
-// 	if(jointNameElement) 
-// 	{
-// 		retrievedJointName = jointNameElement->GetValue()->Get(jointName);
-// 	}
-// 	return retrievedJointName;
-// }
-
-// bool retrieveTicksPerRev(sdf::ElementPtr _sdf, unsigned int& ticksPerRev) {
-// 	bool retrievedTicksPerRev = false;
-// 	sdf::ElementPtr ticksPerRevElement = _sdf->GetElement("ticks_per_revolution");
-// 	if(ticksPerRevElement) 
-// 	{
-// 		retrievedTicksPerRev = ticksPerRevElement->GetValue()->Get(ticksPerRev);
-// 	}
-// 	return retrievedTicksPerRev;
-// }
-
-// bool retrieveTopicName(sdf::ElementPtr _sdf, std::string& topicName) {
-// 	bool retrievedTopicName = false;
-// 	sdf::ElementPtr topicNameElement = _sdf->GetElement("topic_name");
-// 	if(topicNameElement) 
-// 	{
-// 		retrievedTopicName = topicNameElement->GetValue()->Get(topicName);
-// 	}
-// 	return retrievedTopicName;
-// }
-
 template<typename T> bool retrieveFromSDF(sdf::ElementPtr _sdf, T& t, std::string elementName) {
 	bool retrieved = false;
 	sdf::ElementPtr element = _sdf->GetElement(elementName);
