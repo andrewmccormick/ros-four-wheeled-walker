@@ -32,9 +32,6 @@
     <geometry>
      <mesh filename="package://simplified/meshes/Left Front Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
      <origin xyz="${(-27*inch)-forward_leg_extension} ${-1.6*inch} ${(14.63+1.75)*inch}" rpy="${M_PI/2+0.12} 0 ${-M_PI/2-0.06}" />
@@ -56,9 +53,6 @@
     <geometry>
      <mesh filename="package://simplified/meshes/Back Left Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
    <origin xyz="0 0 ${17.8*inch}" rpy="0.025 0.41 ${M_PI/2}" />
@@ -79,9 +73,6 @@
     <geometry>
      <mesh filename="package://simplified/meshes/CoreToLeg.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
      <origin xyz="0 0 ${18.35*inch}" rpy="${M_PI/2} 0 0" />
@@ -102,9 +93,6 @@
     <geometry>
      <mesh filename="package://simplified/meshes/Core Revised.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
     <origin xyz="0 0 ${31*inch}" rpy="${M_PI/2} ${3*M_PI/2} 0" />
@@ -145,9 +133,6 @@
     <geometry>
      <mesh filename="package://simplified/meshes/HandleBottom.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
    <origin xyz="0 0 ${21.75*inch}" rpy="${M_PI/2} 0 0" />
@@ -175,9 +160,6 @@
     <geometry>
      <mesh filename="package://simplified/meshes/Handle Revised.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
    <origin xyz="0 0 ${13.75*inch+handle_height}" rpy="${M_PI/2} 0 ${3*M_PI/2}" />
@@ -204,9 +186,6 @@
     <geometry>
      <mesh filename="package://simplified/meshes/CoreToLeg.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
    <origin xyz="0 0 ${18.35*inch}" rpy="${3*M_PI/2} ${M_PI} 0" />
@@ -234,9 +213,6 @@
     <geometry>
      <mesh filename="package://simplified/meshes/HandleBottom.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
      <origin xyz="0 0 ${21.75*inch}" rpy="${3*M_PI/2} ${M_PI} 0" />
@@ -264,9 +240,6 @@
      <mesh filename="package://simplified/meshes/Handle Revised.STL" 
 scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
     <origin xyz="0 0 ${13.75*inch+handle_height}" rpy="${M_PI/2} 0 ${3*M_PI/2}" />
@@ -294,9 +267,6 @@ scale="0.001 0.001 0.001"/>
     <geometry>
      <mesh filename="package://simplified/meshes/Right Front Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
     <origin xyz="${2.75*inch-forward_leg_extension} ${0*inch} ${(14.63+1.75)*inch}" rpy="${M_PI/2+0.12} 0 ${-M_PI/2-0.06}" />
@@ -328,9 +298,6 @@ scale="0.001 0.001 0.001"/>
     <geometry>
      <mesh filename="package://simplified/meshes/Right Back Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
     <origin xyz="0 0 ${17.8*inch}" rpy="0.025 0.41 ${M_PI/2}" />
@@ -358,20 +325,14 @@ scale="0.001 0.001 0.001"/>
   <visual>
     <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
     <geometry>
-     <mesh filename="package://simplified/meshes/WheelSpinning.STL" scale="0.001 0.001 0.001"/>
+     <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
     <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
     <geometry>
-     <mesh filename="package://simplified/meshes/WheelSpinning.STL" scale="0.001 0.001 0.001"/>
+     <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
     </collision>
     <inertial>
     <origin xyz="0 0 0" rpy="0 0 0" />
@@ -394,16 +355,13 @@ scale="0.001 0.001 0.001"/>
   <visual>
     <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
     <geometry>
-     <mesh filename="package://simplified/meshes/WheelSpinning.STL" scale="0.001 0.001 0.001"/>
+     <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
    <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
     <geometry>
-     <mesh filename="package://simplified/meshes/WheelSpinning.STL" scale="0.001 0.001 0.001"/>
+     <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
     </geometry>
     </collision>
     <inertial>
@@ -413,38 +371,41 @@ scale="0.001 0.001 0.001"/>
     </inertial>
  </link>
 
+<!-- Front Wheel Yaw Joint Params -->
+<xacro:property name="front_yaw_effort_limit" value="100.0"/>
+<xacro:property name="front_yaw_velocity_limit" value="100.0"/>
+<xacro:property name="front_yaw_damping" value="0.5"/>
+<xacro:property name="front_yaw_friction" value="0.0"/>
+
 <joint name="front_right_leg_to_turning_wheel" type="continuous">
     <parent link="front_right_leg"/>
     <child link="front_right_turning_wheel"/>
     <origin xyz="${4.25*inch-forward_leg_extension} ${-2.4*inch} ${10*inch}"/>
-	<axis xyz="0 0 1"/>
-<limit effort="100" velocity="100.0"  />
-     <joint_properties damping="0.05" friction="0.05"/>
-  </joint>
+    <axis xyz="0 0 1"/>
+    <limit effort="${front_yaw_effort_limit}" velocity="${front_yaw_velocity_limit}"  />
+    <joint_properties damping="${front_yaw_damping}" friction="${front_yaw_friction}"/>
+</joint>
 
 <joint name="front_left_leg_to_turning_wheel" type="continuous">
     <parent link="front_left_leg"/>
     <child link="front_left_turning_wheel"/>
     <axis xyz="0 0 1"/>
     <origin xyz="${-25.50*inch-forward_leg_extension} ${-2.4*inch} ${10*inch}"/>
-    <limit effort="100" velocity="100"/>
-     <joint_properties damping="0.05" friction="0.05"/>
-  </joint>
+    <limit effort="${front_yaw_effort_limit}" velocity="${front_yaw_velocity_limit}"  />
+    <joint_properties damping="${front_yaw_damping}" friction="${front_yaw_friction}"/>
+</joint>
 
 <link name="front_right_turning_wheel">
   <visual>
-    <origin xyz="0 0 ${-6*inch}" rpy="0 ${M_PI/2-0.06} 0" />
+    <origin xyz="0 0 0" rpy="0 ${M_PI/2-0.06} 0" />
     <geometry>
-     <mesh filename="package://simplified/meshes/Wheel Direction.STL" scale="0.001 0.001 0.001"/>
+     <mesh filename="package://simplified/meshes/frontwheelhub.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
-    <origin xyz="0 0 ${-6*inch}" rpy="0 ${M_PI/2-0.06} 0" />
+    <origin xyz="0 0 0" rpy="0 ${M_PI/2-0.06} 0" />
     <geometry>
-     <mesh filename="package://simplified/meshes/Wheel Direction.STL" scale="0.001 0.001 0.001"/>
+     <mesh filename="package://simplified/meshes/frontwheelhub.STL" scale="0.001 0.001 0.001"/>
     </geometry>
     </collision>
     <inertial>
@@ -457,18 +418,15 @@ scale="0.001 0.001 0.001"/>
 
 <link name="front_left_turning_wheel">
   <visual>
-    <origin xyz="0 0 ${-6*inch}" rpy="0 ${M_PI/2-0.06} 0" />
+    <origin xyz="0 0 0" rpy="0 ${M_PI/2-0.06} 0" />
     <geometry>
-     <mesh filename="package://simplified/meshes/Wheel Direction.STL" scale="0.001 0.001 0.001"/>
+     <mesh filename="package://simplified/meshes/frontwheelhub.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
-    <origin xyz="0 0 ${-6*inch}" rpy="0 ${M_PI/2-0.06} 0" />
+    <origin xyz="0 0 0" rpy="0 ${M_PI/2-0.06} 0" />
     <geometry>
-     <mesh filename="package://simplified/meshes/Wheel Direction.STL" scale="0.001 0.001 0.001"/>
+     <mesh filename="package://simplified/meshes/frontwheelhub.STL" scale="0.001 0.001 0.001"/>
     </geometry>
     </collision>
     <inertial>
@@ -478,21 +436,26 @@ scale="0.001 0.001 0.001"/>
     </inertial>
  </link>
 
+<!-- Front Wheel Rotational Joint Params -->
+<xacro:property name="front_rotational_effort_limit" value="100.0"/>
+<xacro:property name="front_rotational_velocity_limit" value="100.0"/>
+<xacro:property name="front_rotational_damping" value="0.1"/>
+<xacro:property name="front_rotational_friction" value="0.2"/>
 
 <joint name="front_right_turning_to_spinning" type="continuous">
     <parent link="front_right_turning_wheel"/>
     <child link="front_right_spinning_wheel"/>
     <axis xyz="0 1 0"/>
-    <origin xyz="0 ${0.65*inch} ${-6*inch}"/>
-     <limit effort="100" velocity="100"/>
-      <joint_properties damping="0.1" friction="0.2"/>
+    <origin xyz="0.04558 ${0.65*inch} ${-6*inch}"/>
+    <limit effort="${front_rotational_effort_limit}" velocity="${front_rotational_velocity_limit}"  />
+    <joint_properties damping="${front_rotational_damping}" friction="${front_rotational_friction}"/>
   </joint>
 
 <joint name="front_left_turning_to_spinning" type="continuous">
     <parent link="front_left_turning_wheel"/>
     <child link="front_left_spinning_wheel"/>
     <axis xyz="0 1 0"/>
-    <origin xyz="0 ${0.65*inch} ${-6*inch}"/>
+    <origin xyz="0.04558 ${0.65*inch} ${-6*inch}"/>
     <limit effort="100" velocity="100"/>
       <joint_properties damping="0.1" friction="0.2"/>
   </joint>
@@ -502,20 +465,17 @@ scale="0.001 0.001 0.001"/>
   <visual>
     <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
     <geometry>
-     <mesh filename="package://simplified/meshes/WheelSpinning.STL" scale="0.001 0.001 0.001"/>
+     <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
- </visual>
+  </visual>
     <collision>
    <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
     <geometry>
-     <mesh filename="package://simplified/meshes/WheelSpinning.STL" scale="0.001 0.001 0.001"/>
+     <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
     </geometry>
     </collision>
     <inertial>
-    <origin xyz="0 0 0" rpy="0 0 0" />
+    <origin xyz="0.04558 0 0" rpy="0 0 0" />
       <mass value="2.28"/>
       <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.01"/>
     </inertial>
@@ -526,20 +486,17 @@ scale="0.001 0.001 0.001"/>
   <visual>
     <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
     <geometry>
-     <mesh filename="package://simplified/meshes/WheelSpinning.STL" scale="0.001 0.001 0.001"/>
+     <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
     </geometry>
-     <material name="red">
-      <color rgba="1 0.5 0.5 1"/>
-    </material>
  </visual>
     <collision>
     <origin xyz="0 0 0" rpy="0 0 0" />
     <geometry>
-     <mesh filename="package://simplified/meshes/WheelSpinning.STL" scale="0.001 0.001 0.001"/>
+     <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
     </geometry>
     </collision>
     <inertial>
-    <origin xyz="0 0 0" rpy="0 0 0" />
+    <origin xyz="0.04558 0 0" rpy="0 0 0" />
       <mass value="2.28"/>
       <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.01"/>
     </inertial>
@@ -561,53 +518,60 @@ scale="0.001 0.001 0.001"/>
     <provideFeedback>true</provideFeedback>
 </gazebo>
 
+<!-- Front Wheel Rotational Joint Params -->
+<xacro:property name="wheel_mu1" value="200"/>
+<xacro:property name="wheel_mu2" value="100"/>
+<xacro:property name="wheel_kp" value="1000000"/>
+<xacro:property name="wheel_kd" value="1"/>
+<xacro:property name="wheel_damping" value="0.50"/>
+
 <gazebo reference="front_left_spinning_wheel">
-    <mu1>0.99</mu1>
-    <mu2>0.9</mu2>
-    <kp>1000000</kp>
-    <kd>50</kd>
+    <mu1>${wheel_mu1}</mu1>
+    <mu2>${wheel_mu2}</mu2>
+    <kp>${wheel_kp}</kp>
+    <kd>${wheel_kd}</kd>
     <fdir1>1 0 0</fdir1>
     <gravity>true</gravity>
-    <dampingFactor>0.1</dampingFactor>
-    <material>Gazebo/Black</material>
-    <provideFeedback>true</provideFeedback>
-  </gazebo>
-
-<gazebo reference="back_right_spinning_wheel">
-    <mu1>0.99</mu1>
-    <mu2>0.9</mu2>
-    <kp>1000000</kp>
-    <kd>50</kd>
-    <fdir1>1 0 0</fdir1>
-    <gravity>true</gravity>
-    <dampingFactor>0.1</dampingFactor>
-    <material>Gazebo/Black</material>
-    <provideFeedback>true</provideFeedback>
-  </gazebo>
-
-<gazebo reference="back_left_spinning_wheel">
-    <mu1>0.99</mu1>
-    <mu2>0.9</mu2>
-    <kp>1000000</kp>
-    <kd>50</kd>
-    <fdir1>1 0 0</fdir1>
-    <gravity>true</gravity>
-    <dampingFactor>0.1</dampingFactor>
-    <material>Gazebo/Black</material>
+    <dampingFactor>${wheel_damping}</dampingFactor>
+    <material>Gazebo/Blue</material>
     <provideFeedback>true</provideFeedback>
   </gazebo>
 
 <gazebo reference="front_right_spinning_wheel">
-    <mu1>0.99</mu1>
-    <mu2>0.9</mu2>
-    <kp>1000000</kp>
-    <kd>50</kd>
+    <mu1>${wheel_mu1}</mu1>
+    <mu2>${wheel_mu2}</mu2>
+    <kp>${wheel_kp}</kp>
+    <kd>${wheel_kd}</kd>
     <fdir1>1 0 0</fdir1>
     <gravity>true</gravity>
-    <dampingFactor>0.1</dampingFactor>
+    <dampingFactor>${wheel_damping}</dampingFactor>
+    <material>Gazebo/Red</material>
+    <provideFeedback>true</provideFeedback>
+</gazebo>
+
+<gazebo reference="back_right_spinning_wheel">
+    <mu1>${wheel_mu1}</mu1>
+    <mu2>${wheel_mu2}</mu2>
+    <kp>${wheel_kp}</kp>
+    <kd>${wheel_kd}</kd>
+    <fdir1>1 0 0</fdir1>
+    <gravity>true</gravity>
+    <dampingFactor>${wheel_damping}</dampingFactor>
     <material>Gazebo/Black</material>
     <provideFeedback>true</provideFeedback>
-  </gazebo>
+</gazebo>
+
+<gazebo reference="back_left_spinning_wheel">
+    <mu1>${wheel_mu1}</mu1>
+    <mu2>${wheel_mu2}</mu2>
+    <kp>${wheel_kp}</kp>
+    <kd>${wheel_kd}</kd>
+    <fdir1>1 0 0</fdir1>
+    <gravity>true</gravity>
+    <dampingFactor>${wheel_damping}</dampingFactor>
+    <material>Gazebo/Black</material>
+    <provideFeedback>true</provideFeedback>
+</gazebo>
 
   <joint name="camera_rgb_joint" type="fixed">
     <origin xyz="${cam_px+2*inch} ${kinect_cam_py+9*inch} ${cam_pz+22.5*inch}" rpy="${cam_or} ${cam_op} ${cam_oy+M_PI}"/>
