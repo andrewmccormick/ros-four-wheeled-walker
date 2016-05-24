@@ -1,6 +1,20 @@
 <?xml version="1.0"?>
 <robot name="walkernew" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
+<!-- Table of Contents - (ctrl-f to jump)
+Links: 
+front left leg -               [FLL_L]
+back left leg  -               [BLL_L]
+core to left leg (link) -      [CTLL_L]
+core (link) -                  [CORE_L]
+handle left
+handle bottom left to handle
+front right turning wheel -    [FRTW_L]
+front left turning wheel -     [FLTW_L]
+front right spinning wheel -   [FRSW_L]
+front left spinning wheel -    [FLSW_L]
+-->
+
 <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/walkernew</robotNamespace>
@@ -18,14 +32,17 @@
 	<property name="cam_or" value="0" />
 	<property name="cam_op" value="0" />
 	<property name="cam_oy" value="0" />
- <origin xyz="0 0 0" rpy="0 0 0"/>
-<!-- List of Editable Walker Dimensions-->
-<property name="forward_leg_extension" value="${4*inch}" />
-<property name="backwards_leg_extension" value="${4*inch}" />
-<property name="frame_width" value="${3*inch}" />
-<property name="handle_width" value="${3*inch}" />
-<property name="handle_height" value="${5*inch}" />
+   <origin xyz="0 0 0" rpy="0 0 0"/>
+   
+  <!-- List of Editable Walker Dimensions-->
+  <property name="forward_leg_extension" value="${4*inch}" />
+  <property name="backwards_leg_extension" value="${4*inch}" />
+  <property name="frame_width" value="${3*inch}" />
+  <property name="handle_width" value="${3*inch}" />
+  <property name="handle_height" value="${5*inch}" />
 
+
+<!-- [FLL_L] -->
 <link name="front_left_leg">
   <visual>
     <origin xyz="${(-27*inch)-forward_leg_extension} ${-1.6*inch} ${(14.63+1.75)*inch}" rpy="${M_PI/2+0.12} 0 ${-M_PI/2-0.06}" />
@@ -46,7 +63,7 @@
     </inertial>
  </link>
 
-
+<!-- [BLL_L] -->
 <link name="back_left_leg">
   <visual>
     <origin xyz="${backwards_leg_extension} 0 ${17.8*inch}" rpy="0.025 0.41 ${M_PI/2}" />
@@ -67,6 +84,7 @@
     </inertial>
  </link>
 
+<!-- [CTLL_L] -->
 <link name="core_to_leg_left">
   <visual>
     <origin xyz="0 0 ${18.35*inch}" rpy="${M_PI/2} 0 0" />
@@ -87,6 +105,7 @@
     </inertial>
  </link>
 
+<!-- [CORE_L] -->
 <link name="core">
   <visual>
     <origin xyz="0 0 ${31*inch}" rpy="${M_PI/2} ${3*M_PI/2} 0" />
@@ -395,6 +414,7 @@ scale="0.001 0.001 0.001"/>
     <joint_properties damping="${front_yaw_damping}" friction="${front_yaw_friction}"/>
 </joint>
 
+<!-- [FRTW_L] -->
 <link name="front_right_turning_wheel">
   <visual>
     <origin xyz="0 0 0" rpy="0 ${M_PI/2-0.06} 0" />
@@ -403,19 +423,19 @@ scale="0.001 0.001 0.001"/>
     </geometry>
  </visual>
     <collision>
-    <origin xyz="0 0 0" rpy="0 ${M_PI/2-0.06} 0" />
-    <geometry>
-     <mesh filename="package://simplified/meshes/frontwheelhub.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
+      <origin xyz="0 0 0" rpy="0 ${M_PI/2-0.06} 0" />
+      <geometry>
+         <mesh filename="package://simplified/meshes/frontwheelhub.STL" scale="0.001 0.001 0.001"/>
+      </geometry>
     </collision>
     <inertial>
-    <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
       <mass value="0.79"/>
       <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0"/>
     </inertial>
  </link>
 
-
+<!-- [FLTW_L] -->
 <link name="front_left_turning_wheel">
   <visual>
     <origin xyz="0 0 0" rpy="0 ${M_PI/2-0.06} 0" />
@@ -456,11 +476,11 @@ scale="0.001 0.001 0.001"/>
     <child link="front_left_spinning_wheel"/>
     <axis xyz="0 1 0"/>
     <origin xyz="0.04558 ${0.65*inch} ${-6*inch}"/>
-    <limit effort="100" velocity="100"/>
-      <joint_properties damping="0.1" friction="0.2"/>
+    <limit effort="${front_rotational_effort_limit}" velocity="${front_rotational_velocity_limit}"  />
+    <joint_properties damping="${front_rotational_damping}" friction="${front_rotational_friction}"/>
   </joint>
 
-
+<!-- [FRSW_L] -->
 <link name="front_right_spinning_wheel">
   <visual>
     <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
@@ -481,7 +501,7 @@ scale="0.001 0.001 0.001"/>
     </inertial>
  </link>
 
-
+<!-- [FLSW_L] -->
 <link name="front_left_spinning_wheel">
   <visual>
     <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
@@ -519,11 +539,11 @@ scale="0.001 0.001 0.001"/>
 </gazebo>
 
 <!-- Front Wheel Rotational Joint Params -->
-<xacro:property name="wheel_mu1" value="200"/>
-<xacro:property name="wheel_mu2" value="100"/>
+<xacro:property name="wheel_mu1" value="0.99"/>
+<xacro:property name="wheel_mu2" value="0.90"/>
 <xacro:property name="wheel_kp" value="1000000"/>
-<xacro:property name="wheel_kd" value="1"/>
-<xacro:property name="wheel_damping" value="0.50"/>
+<xacro:property name="wheel_kd" value="500000"/>
+<xacro:property name="wheel_damping" value="0.10"/>
 
 <gazebo reference="front_left_spinning_wheel">
     <mu1>${wheel_mu1}</mu1>
