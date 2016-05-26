@@ -5,14 +5,26 @@
   <arg name="debug" default="false"/>
   <arg name="gui" default="true"/>
 
-  <node name="rgbd_odometry" pkg="rtabmap" type="rgbd_odometry">
+  <node name="encoder_odometry" pkg="simplified" type="encoder_odometry"/>
+
+  <!-- RTABMAP args -->
+  <arg name="rgb_topic"               default="/camera/rgb/image_raw" />
+  <arg name="depth_registered_topic"  default="/camera/depth_registered/image_raw" />
+  <arg name="camera_info_topic"       default="/camera/rgb/camera_info" />
+
+  <node ns="visual_odom" name="rgbd_odometry" pkg="rtabmap_ros" type="rgbd_odometry">
         <param name="frame_id" value="base_footprint"/>
+        <param name="odom_frame_id" value="odom"/>
         <param name="publish_tf" value="false"/>
         <param name="initial_pose" value="0 0 0 0 0 0"/>
+        <param name="Odom/FillInfoData" type="string" value="true"/>
 
+        <remap from="rgb/image"       to="$(arg rgb_topic)"/>
+        <remap from="depth/image"     to="$(arg depth_registered_topic)"/>
+        <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/>
   </node>
- 
-  <node name="robot_localization" pkg="robot_localization" type="ekf_localization_node">
+  
+  <node name="odometry_fusion" pkg="robot_localization" type="ekf_localization_node">
          <param name="frequency" value="20"/> 
          <param name="two_d_mode" value="true"/> 
          <param name="map_frame" value="map"/> 
@@ -23,10 +35,13 @@
          <param name="world_frame" value="odom"/> 
          
          <!-- Specify the incoming sensors to fuse, and which topic they send data over  -->
-         <param name="odom0" value="odom/encoder"/> 
-         <param name="odom1" value="odom/visual"/> 
+         <param name="odom0" value="encoder_odom/odom"/> 
+         <param name="odom1" value="visual_odom/odom"/> 
          
          <!-- Specify the configs for each of the incoming sensors to fuse -->
+         <!-- odomX_config specifies which aspects of the incoming odometry to actually use
+              ie: if x, y, and z are set to false, the robot_localization node will try to use
+                  higher order derivatives and integration methods to estimate current pose  -->
          <rosparam param="odom0_config">[false, false, false,               <!-- x, y, z -->
                                          false, false, false,               <!-- r, p, y -->
                                          true,  true,  false,               <!-- vx, vy, vz -->
@@ -34,13 +49,70 @@
                                          false, false, false]</rosparam>    <!-- ax, ay, az -->
 
          
-         <rosparam param="odom0_config">[true,  true,  false,               <!-- x, y, z -->     
+         <rosparam param="odom1_config">[true,  true,  false,               <!-- x, y, z -->     
                                          false, false, true,                <!-- r, p, y -->     
                                          true,  true,  false,               <!-- vx, vy, vz -->  
                                          false, false, true,                <!-- vr, vp, vy -->  
-                                         false, false, false]</rosparam>    <!-- ax, ay, az -->  
+                                         false, false, false]</rosparam>     <!-- ax, ay, az -->  
+
+         <!-- setting odomX_relative to true means that any measurements will be considered with respect to the first measurement
+                this forces odometry to always start at (0, 0, 0; 0, 0) -->
+         <param name="odom0_relative" value="true"/>
+         <param name="odom1_relative" value="true"/>
         
-          <param name="odom0_relative" value="true"/>
-          <param name="odom1_relative" value="true"/>
+         <!-- publishes diagnostics to the /diagnostics topic, probably helpful for debugging -->
+         <param name="print_diagnostics" value="true"/>
   </node>
+
+  <!-- RTABMAP args -->
+  <arg name="database_path"           default="~/.ros/rtabmap.db"/>
+  <arg name="time_threshold"          default="0"/>             <!-- (ms) If not 0 ms, memory management is used to keep processing time on this fixed limit. -->
+  <arg name="optimize_from_last_node" default="false"/>
+  <arg name="convert_depth_to_mm"     default="true"/>
+  <!-- to avoid rtabmap localization ONLY mode -->
+  <arg name="localization"            default="false"/>
+  
+
+  <!-- rtabmap publishes to map to odom tf -->
+  <node name="rtabmap" pkg="rtabmap_ros" type="rtabmap" output="screen" args="delete_db_on_start">
+      <param name="subscribe_depth"             type="bool"   value="true"/>
+      <param name="subscribe_scan"              type="bool"   value="false"/>
+      <param name="subscribe_scan_cloud"        type="bool"   value="false"/>
+
+      <param name="frame_id"                    type="string" value="base_footprint"/>
+      <param name="wait_for_transform_duration" type="double" value="0.2"/>
+      <param name="database_path"               type="string" value="$(arg database_path)"/>
+
+      <remap from="rgb/image"       to="$(arg rgb_topic)"/>
+      <remap from="depth/image"     to="$(arg depth_registered_topic)"/>
+      <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/>
+      <remap from="odom"  to="odometry/filtered"/>
+      
+      <param name="Rtabmap/TimeThr"              type="string" value="$(arg time_threshold)"/>
+      <param name="RGBD/OptimizeFromGraphEnd"    type="string" value="$(arg optimize_from_last_node)"/>
+      <param name="Mem/SaveDepth16Format"        type="string" value="$(arg convert_depth_to_mm)"/>
+
+      <!-- localization mode stuff -->
+      <param     if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
+      <param unless="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true"/>
+      <param name="Mem/InitWMWithAllNodes" type="string" value="$(arg localization)"/>      
+
+  </node>
+
+  <arg name="rtabmapviz_cfg"          default="-d $(find rtabmap_ros)/launch/config/rgbd_gui.ini" />
+  <node pkg="rtabmap_ros" type="rtabmapviz" name="rtabmapviz" args="$(arg rtabmapviz_cfg)" output="screen">
+      <param name="subscribe_depth"       type="bool"   value="true"/>
+      <param name="subscribe_scan"        type="bool"   value="false"/>
+      <param name="subscribe_scan_cloud"  type="bool"   value="false"/>
+      <param name="subscribe_odom_info"   type="bool"   value="false"/>
+      <param name="frame_id"                    type="string" value="base_footprint"/>
+      <param name="wait_for_transform_duration"  type="double"   value="0.2"/>
+      <param name="publish_tf"          type="bool"   value="false"/>   
+
+      <remap from="rgb/image"       to="$(arg rgb_topic)"/>
+      <remap from="depth/image"     to="$(arg depth_registered_topic)"/>
+      <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/>
+      <remap from="odom"  to="odometry/filtered"/>
+  </node>
+
 </launch>

@@ -1,137 +1,162 @@
 <?xml version="1.0"?>
 <robot name="walkernew" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<origin xyz="0 0 0" rpy="0 0 0"/>
 
 <!-- Table of Contents - (ctrl-f to jump)
+Xacro Properties:
+
+Plugins: 
+    Wheel Encoders:
+    Gazebo Ros Control (Joint Controllers):
+
 Links: 
-front left leg -               [FLL_L]
-back left leg  -               [BLL_L]
-core to left leg (link) -      [CTLL_L]
-core (link) -                  [CORE_L]
-handle left
-handle bottom left to handle
-front right turning wheel -    [FRTW_L]
-front left turning wheel -     [FLTW_L]
-front right spinning wheel -   [FRSW_L]
-front left spinning wheel -    [FLSW_L]
+
+    Base Footprint                 [BFP_L]
+    Core (Base Link)               [CORE_L]
+    Front Left Leg                 [FLL_L]
+    Back Left Leg                  [BLL_L]
+    Core to Left Leg (link)        [CTLL_L]
+    Core (link)                    [CORE_L]
+    Handle Left
+    Front Left Leg to Back Leg     [FLLTBL_L]    
+    Handle Bottom Left to Handle
+    Front Right Turning Wheel      [FRTW_L]
+    Front Left Turning Wheel       [FLTW_L]
+    Front Right Spinning Wheel     [FRSW_L]
+    Front Left Spinning Wheel      [FLSW_L]
 -->
 
+<!-- PROPERTY LIST -->
+<!--All units in m-kg-s-radians unit system -->
+<property name="M_PI" value="3.1415926535897931" />
+<property name="inch" value="0.0254"/>
+
+<!-- Kinect Camera Module specific properties for pose -->
+<property name="cam_px" value="-0.087" />
+<property name="cam_py" value="-0.0125" /> 
+<property name="cam_pz" value="0.2870" />
+<property name="cam_or" value="0" />
+<property name="cam_op" value="0" />
+<property name="cam_oy" value="0" />
+
+<!-- List of Editable Walker Dimensions-->
+<property name="forward_leg_extension" value="${4*inch}" />
+<property name="backwards_leg_extension" value="${4*inch}" />
+<property name="frame_width" value="${3*inch}" />
+<property name="handle_width" value="${3*inch}" />
+<property name="handle_height" value="${5*inch}" />
+
+<!--    Gazebo Ros Control Plugin
+        Allows us to generate controllers for joints
+        Controllers will be nodes within the /walkernew namespace    -->
 <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-      <robotNamespace>/walkernew</robotNamespace>
-    <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+        <robotNamespace>/walkernew</robotNamespace>
+        <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
     </plugin>
-  </gazebo>
+</gazebo>
 
-<!-- PROPERTY LIST -->
-  <!--All units in m-kg-s-radians unit system -->
-  <property name="M_PI" value="3.1415926535897931" />
-  <property name="inch" value="0.0254"/>
-	<property name="cam_px" value="-0.087" />
-	<property name="kinect_cam_py" value="-0.0125" /> 
-	<property name="cam_pz" value="0.2870" />
-	<property name="cam_or" value="0" />
-	<property name="cam_op" value="0" />
-	<property name="cam_oy" value="0" />
-   <origin xyz="0 0 0" rpy="0 0 0"/>
-   
-  <!-- List of Editable Walker Dimensions-->
-  <property name="forward_leg_extension" value="${4*inch}" />
-  <property name="backwards_leg_extension" value="${4*inch}" />
-  <property name="frame_width" value="${3*inch}" />
-  <property name="handle_width" value="${3*inch}" />
-  <property name="handle_height" value="${5*inch}" />
+<!-- Base Footprint [BFP_L]-->
+<link name="base_footprint">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+</link>
 
+<joint name="base_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="core"/>
+    <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
+</joint>
 
-<!-- [FLL_L] -->
+<!-- Core (Base Link) [CORE_L] -->
+<link name="core">
+    <visual>
+        <origin xyz="0 0 ${31*inch}" rpy="${M_PI/2} ${3*M_PI/2} 0" />
+        <geometry>
+            <mesh filename="package://simplified/meshes/Core Revised.STL" scale="0.001 0.001 0.001"/>
+        </geometry>
+    </visual>
+    <collision>
+        <origin xyz="0 0 ${31*inch}" rpy="${M_PI/2} ${3*M_PI/2} 0" />
+        <geometry>
+            <mesh filename="package://simplified/meshes/Core Revised.STL" scale="0.001 0.001 0.001"/>
+        </geometry>
+    </collision>
+    <inertial>
+        <origin xyz="0 0.2 -0.2" rpy="0 0 0" />
+        <mass value="7.6"/>
+        <inertia ixx="0.91" ixy="0" ixz="0" iyy="0.47" iyz="-0.37" izz="0.46"/>
+    </inertial>
+</link>
+
+<!-- Front Left Leg - [FLL_L] -->
 <link name="front_left_leg">
-  <visual>
-    <origin xyz="${(-27*inch)-forward_leg_extension} ${-1.6*inch} ${(14.63+1.75)*inch}" rpy="${M_PI/2+0.12} 0 ${-M_PI/2-0.06}" />
-    <geometry>
-     <mesh filename="package://simplified/meshes/Left Front Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
- </visual>
+    <visual>
+        <origin xyz="${(-27*inch)-forward_leg_extension} ${-1.6*inch} ${(14.63+1.75)*inch}" rpy="${M_PI/2+0.12} 0 ${-M_PI/2-0.06}" />
+        <geometry>
+            <mesh filename="package://simplified/meshes/Left Front Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
+        </geometry>
+    </visual>
     <collision>
-     <origin xyz="${(-27*inch)-forward_leg_extension} ${-1.6*inch} ${(14.63+1.75)*inch}" rpy="${M_PI/2+0.12} 0 ${-M_PI/2-0.06}" />
-    <geometry>
-     <mesh filename="package://simplified/meshes/Left Front Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
+        <origin xyz="${(-27*inch)-forward_leg_extension} ${-1.6*inch} ${(14.63+1.75)*inch}" rpy="${M_PI/2+0.12} 0 ${-M_PI/2-0.06}" />
+        <geometry>
+            <mesh filename="package://simplified/meshes/Left Front Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
+        </geometry>
     </collision>
     <inertial>
-    <origin xyz="-0.22 -0.13 0.14" rpy="0 0 0" />
-      <mass value="2.04"/>
-      <inertia ixx="0.08" ixy="-0.06" ixz="0.07" iyy="0.18" iyz="-0.04" izz="0.17"/>
+        <origin xyz="-0.22 -0.13 0.14" rpy="0 0 0" />
+        <mass value="2.04"/>
+        <inertia ixx="0.08" ixy="-0.06" ixz="0.07" iyy="0.18" iyz="-0.04" izz="0.17"/>
     </inertial>
- </link>
+</link>
 
-<!-- [BLL_L] -->
+<!-- Back Left Leg - [BLL_L] -->
 <link name="back_left_leg">
-  <visual>
-    <origin xyz="${backwards_leg_extension} 0 ${17.8*inch}" rpy="0.025 0.41 ${M_PI/2}" />
-    <geometry>
-     <mesh filename="package://simplified/meshes/Back Left Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
- </visual>
+    <visual>
+        <origin xyz="${backwards_leg_extension} 0 ${17.8*inch}" rpy="0.025 0.41 ${M_PI/2}" />
+        <geometry>
+            <mesh filename="package://simplified/meshes/Back Left Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
+        </geometry>
+    </visual>
     <collision>
-   <origin xyz="0 0 ${17.8*inch}" rpy="0.025 0.41 ${M_PI/2}" />
-    <geometry>
-     <mesh filename="package://simplified/meshes/Back Left Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
+        <origin xyz="0 0 ${17.8*inch}" rpy="0.025 0.41 ${M_PI/2}" />
+        <geometry>
+            <mesh filename="package://simplified/meshes/Back Left Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
+        </geometry>
     </collision>
     <inertial>
-    <origin xyz="-0.09 0.01 -0.08" rpy="0 0 0" />
-      <mass value="2.11"/>
-      <inertia ixx="0.04" ixy="0" ixz="0" iyy="0.07" iyz="0" izz="0.04"/>
+        <origin xyz="-0.09 0.01 -0.08" rpy="0 0 0" />
+        <mass value="2.11"/>
+        <inertia ixx="0.04" ixy="0" ixz="0" iyy="0.07" iyz="0" izz="0.04"/>
     </inertial>
- </link>
+</link>
 
 <!-- [CTLL_L] -->
 <link name="core_to_leg_left">
-  <visual>
-    <origin xyz="0 0 ${18.35*inch}" rpy="${M_PI/2} 0 0" />
-    <geometry>
-     <mesh filename="package://simplified/meshes/CoreToLeg.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
- </visual>
+    <visual>
+        <origin xyz="0 0 ${18.35*inch}" rpy="${M_PI/2} 0 0" />
+        <geometry>
+            <mesh filename="package://simplified/meshes/CoreToLeg.STL" scale="0.001 0.001 0.001"/>
+        </geometry>
+    </visual>
     <collision>
-     <origin xyz="0 0 ${18.35*inch}" rpy="${M_PI/2} 0 0" />
-    <geometry>
-     <mesh filename="package://simplified/meshes/CoreToLeg.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
+        <origin xyz="0 0 ${18.35*inch}" rpy="${M_PI/2} 0 0" />
+        <geometry>
+            <mesh filename="package://simplified/meshes/CoreToLeg.STL" scale="0.001 0.001 0.001"/>
+        </geometry>
     </collision>
     <inertial>
-    <origin xyz="0 -0.01 -0.13" rpy="0 0 0" />
-      <mass value="1.56"/>
-      <inertia ixx="0.04" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0"/>
+        <origin xyz="0 -0.01 -0.13" rpy="0 0 0" />
+        <mass value="1.56"/>
+        <inertia ixx="0.04" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0"/>
     </inertial>
- </link>
+</link>
 
-<!-- [CORE_L] -->
-<link name="core">
-  <visual>
-    <origin xyz="0 0 ${31*inch}" rpy="${M_PI/2} ${3*M_PI/2} 0" />
-    <geometry>
-     <mesh filename="package://simplified/meshes/Core Revised.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
- </visual>
-    <collision>
-    <origin xyz="0 0 ${31*inch}" rpy="${M_PI/2} ${3*M_PI/2} 0" />
-    <geometry>
-     <mesh filename="package://simplified/meshes/Core Revised.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
-    </collision>
-    <inertial>
-    <origin xyz="0 0.2 -0.2" rpy="0 0 0" />
-      <mass value="7.6"/>
-      <inertia ixx="0.91" ixy="0" ixz="0" iyy="0.47" iyz="-0.37" izz="0.46"/>
-    </inertial>
- </link>
-
-
+<!-- Front Left Leg to Back Leg [FLLTBL_L] -->
 <joint name="front_left_leg_to_back_leg" type="fixed">
     <parent link="front_left_leg"/>
     <child link="back_left_leg"/>
     <origin xyz="${-6.75*inch-forward_leg_extension+backwards_leg_extension} ${3.9*inch} 0"/>
-  </joint>
+</joint>
 
 
 <joint name="core_to_leg_left_to_front_leg" type="fixed">
@@ -594,7 +619,7 @@ scale="0.001 0.001 0.001"/>
 </gazebo>
 
   <joint name="camera_rgb_joint" type="fixed">
-    <origin xyz="${cam_px+2*inch} ${kinect_cam_py+9*inch} ${cam_pz+22.5*inch}" rpy="${cam_or} ${cam_op} ${cam_oy+M_PI}"/>
+    <origin xyz="${cam_px+2*inch} ${cam_py+9*inch} ${cam_pz+22.5*inch}" rpy="${cam_or} ${cam_op} ${cam_oy+M_PI}"/>
     <parent link="core"/>
     <child link="camera_rgb_frame" />
   </joint>
@@ -610,7 +635,7 @@ scale="0.001 0.001 0.001"/>
   <link name="camera_rgb_optical_frame"/>
 
   <joint name="camera_joint" type="fixed">
-    <origin xyz="-0.031 ${-kinect_cam_py} -0.016" rpy="0 0 0"/>
+    <origin xyz="-0.031 ${-cam_py} -0.016" rpy="0 0 0"/>
     <parent link="camera_rgb_frame"/>
     <child link="camera_link"/>
   </joint> 
@@ -643,7 +668,7 @@ scale="0.001 0.001 0.001"/>
          files. However, for Gazebo simulation we need them, so we add them here.
          (Hence, don't publish them additionally!) -->
 	<joint name="camera_depth_joint" type="fixed">
-	  <origin xyz="0 ${2 * -kinect_cam_py} 0" rpy="0 0 0" />
+	  <origin xyz="0 ${2 * -cam_py} 0" rpy="0 0 0" />
 	  <parent link="camera_rgb_frame" />
 	  <child link="camera_depth_frame" />
 	</joint>
@@ -753,16 +778,6 @@ scale="0.001 0.001 0.001"/>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
-
-
-  <link name="base_footprint">
-    <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
-  </link>
-
-  <joint name="base_joint" type="fixed">
-    <parent link="base_footprint"/>
-    <child link="core"/>
-  </joint>
 
   <gazebo>
     <plugin name="rearLeftWheel_encoder_plugin" filename="libwheel_encoder_plugin.so">

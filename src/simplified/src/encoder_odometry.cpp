@@ -59,8 +59,8 @@ EncoderOdometry::EncoderOdometry()
     
 	leftWheelSubscriber = nodeHandle.subscribe(leftWheelTopic, 1000, &EncoderOdometry::leftSubCallback, this);
 	rightWheelSubscriber = nodeHandle.subscribe(rightWheelTopic, 1000, &EncoderOdometry::rightSubCallback, this);
-	odomPublisher = nodeHandle.advertise<nav_msgs::Odometry>("odom/encoder", 50);
-	publishTimer = nodeHandle.createTimer(ros::Duration(0.1), &EncoderOdometry::periodicPublishCallback, this, false);
+	odomPublisher = nodeHandle.advertise<nav_msgs::Odometry>("encoder_odom/odom", 50);
+	publishTimer = nodeHandle.createTimer(ros::Duration(0.05), &EncoderOdometry::periodicPublishCallback, this, false);
 }
 
 void EncoderOdometry::leftSubCallback(const std_msgs::Int64& ticks) {
@@ -80,16 +80,17 @@ void EncoderOdometry::rightSubCallback(const std_msgs::Int64& ticks) {
 double EncoderOdometry::computeVelocity(std::vector<TimeStampedTick>* v) {
 	if(v->size() == 0) return 0;
 	// x = time, y = ticks
+	// compute slope of line of best fit, using least squares method
 	// first: compute means
 	double xMean = 0.0;
 	double yMean = 0.0;
 	for(int i = 0; i < v->size(); i++) {
 		/* Dividing inside the loop kinda sucks, 
 		   but its better than overflow errors :D
-		   (which is to say overflow will actually happen without this sadface) 
+		   (which is to say overflow will actually happen without this, sadface) 
 		*/
-		xMean += v->at(i).time.toSec() / v->size();
-		yMean += ((double)(v->at(i).ticks)) / v->size();
+		xMean += ((double)(v->at(i).time.toSec()) / v->size());
+		yMean += (((double)(v->at(i).ticks)) / v->size());
 	}
 
 	/*     n 
@@ -129,7 +130,7 @@ void EncoderOdometry::periodicPublishCallback(const ros::TimerEvent& event) {
 
 	double leftVelocity = computeVelocity(&leftWheelVector);
 	double rightVelocity = computeVelocity(&rightWheelVector);
-	ROS_INFO("rearLeftVelocity: %f, rearRightVelocity: %f \n", leftVelocity, rightVelocity);
+//	ROS_INFO("rearLeftVelocity: %f, rearRightVelocity: %f \n", leftVelocity, rightVelocity);
 	leftWheelVector.clear();
 	rightWheelVector.clear();
 
@@ -137,7 +138,7 @@ void EncoderOdometry::periodicPublishCallback(const ros::TimerEvent& event) {
 	   (the coordinate system of interest) 					
 	*/
 	double base_link_velocity = (leftVelocity + rightVelocity) / 2.0;
-	double base_link_angular_velocity = (rightVelocity - leftVelocity) / rearTrack;
+	double base_link_angular_velocity = fabs(rightVelocity - leftVelocity) < 0.001 ? 0.0 : (rightVelocity - leftVelocity) / rearTrack;
 	ros::Time timeStamp((currentTime.toSec() + lastTime.toSec()) / 2.0);
 
 	nav_msgs::Odometry odom_msg;
@@ -156,6 +157,8 @@ void EncoderOdometry::periodicPublishCallback(const ros::TimerEvent& event) {
 	*/
 	odomPublisher.publish(odom_msg);	 
 	lastTime = currentTime;
+	// ROS_INFO("velocity: %f, angularVelocity: %f \n rearLeftVelocity: %f, rearRightVelocity: %f \n", 
+	// 	      base_link_velocity, base_link_angular_velocity, leftVelocity, rightVelocity);
 }
 
 int main(int argc, char **argv)

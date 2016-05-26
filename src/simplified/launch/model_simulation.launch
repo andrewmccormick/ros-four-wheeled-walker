@@ -17,12 +17,4 @@
 
   <node name="base_controller1" pkg="simplified" type="base_controller" output="screen"> </node>
 
-<!--   <node name="odom_sim" pkg="simplified" type="odom_simulator" output="screen"> </node> -->
-  
-<!--   <include file="$(find walkernew)/launch/kinect.launch">
-  </include> -->
-
-<!--   <include file="$(find walkernew)/launch/walkernew_rviz.launch">
-  </include> -->
-
 </launch>

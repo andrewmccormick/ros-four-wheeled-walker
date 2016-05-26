@@ -55,6 +55,7 @@ public:
     left_turn_.publish(leftTurnAngle);	
     right_spin_.publish(rightLinearSpeed);
     right_turn_.publish(rightTurnAngle);
+//    ROS_INFO("rearLeftVelocity: %f, rearRightVelocity: %f \n", frontLeftAngularSpeed, frontRightAngularSpeed);
   }
 
 private:

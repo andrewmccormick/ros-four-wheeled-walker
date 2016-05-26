@@ -22,6 +22,6 @@
   <!-- Issue command to gazebo to spawn the walker model, at 
 	position (0, 0, 0), orientation (0, 0, 0) -->
   <node name="walkernew_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" 
-    args="-urdf -param robot_description -x 0 -y 0 -z 0 -R 0 -P 0 -Y 0 -model walkernew_model" />
+    args="-urdf -param robot_description -x 0 -y 0 -z 0 -R 0 -P 0 -Y 3.141592 -model walkernew_model" />
 
 </launch>
