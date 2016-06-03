@@ -15,6 +15,6 @@
 
   <rosparam command="load" file="$(find simplified)/configs/vehicle_params.yaml" />
 
-  <node name="base_controller1" pkg="simplified" type="base_controller" output="screen"> </node>
+  <node name="base_controller" pkg="simplified" type="base_controller" output="screen"> </node>
 
 </launch>
