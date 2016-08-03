@@ -1,0 +1,32 @@
+core: transformation from origin to top-centre of part
+x: -17.53, y: 0 , z: -245.26
+
+corerev2: transformation from origin to side centre top of part
+x: -25.04, y: 254.31 , z: -18.49
+
+core_to_leg: transformation from origin (CoM) to useful point (centred above joint)
+x: 0.57, y: 62.19, z: 27
+
+front_leg: transformation from origin (CoM) to useful point (centred above joint sorta)
+x: 2.99, y: -222.95, z: 34.24
+
+handle_bottom: transformatin from origin (CoM) to useful point 
+x: 0, y: -49.06, z: 230.33
+
+handle assembly: origin to useful joint point
+x: 7.87 y: -0.13 z: 223.12
+
+handle assembly: origin to handle height point
+x: -250.69 y: -1.01 z: 269.36
+
+left back leg: origin to probably joint place
+x: -5.54, y: 194.70, z: 67.12
+
+left front leg: origin to proably joint place
+x: -2.99, y: -222.95, z: 34.24
+
+left handle: origin to probablyl joint place
+x: -14.63, y: 0, z: 208.74
+
+handle assembly revised 2:
+x: -64.75, y: 0, z: -156.06 

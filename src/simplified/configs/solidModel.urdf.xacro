@@ -3,42 +3,37 @@
 <origin xyz="0 0 0" rpy="0 0 0"/>
 
 <!-- Table of Contents - (ctrl-f to jump)
-Xacro Properties:
 
-Plugins: 
-    Wheel Encoders Plugins         [WENC_P]
-    Gazebo Ros Control (Joint Controllers):
+Property List:
+    Constants
+    Walker Configuration Dimensions
 
-Links: 
-    Base Footprint                 [BFP_L]
-    Core (Base Link)               [CORE_L]
-    Front Left Leg                 [FLL_L]
-    Back Left Leg                  [BLL_L]
-    Core to Left Leg (link)        [CTLL_L]
-    Front Left Leg to Back Leg     [FLLTBL_L]    
-    Handle Bottom Left             [HBL_L]
-    Handle Left                    [HL_L]
-    Core to Leg Right              [CTLR_L]
-    Handle Bottom Right            [HBR_L]
-    Handle Right                   [HR_L]
-    Front Right Leg                [FRL_L]
-    Back Right Leg                 [BRL_L]
-    Back Right Spinning Wheel      [BRSW_L]
-    Back Left Spinning Wheel       [BLSW_L] 
-    Front Right Turning Wheel      [FRTW_L]
-    Front Left Turning Wheel       [FLTW_L]
-    Front Right Spinning Wheel     [FRSW_L]
-    Front Left Spinning Wheel      [FLSW_L]
-    Camera RGB Optical Frame       [CROF_L]
-    Camera Link                    [CAM_L]
+Plugins:
+    Gazebo Ros Controls
+    Wheel Encoder
+
+Links & Joints:
+    Base Coordinate Systems             [BCS]
+    Core                                [CORE]
+    Track Extenders                     [TR_EX]
+    Front Legs                          [FR_LGS]
+    Back Legs                           [BK_LGS]
+    Front Wheels                        [FR_WLS]
+    Back Wheels                         [BK_WLS]
+    Handle Tracks                       [HN_TRS]
+    Handles                             [HNDLS]
+    Kinect Camera                       [KNCT]
 
 Transmissions:
-    Right Turning Wheel            [RTW_T]
-    Left Turning Wheel             [LTW_T]
-    Right Spinning Wheel           [RSW_T]
-    Left Spinning Wheel            [LSW_T]
-    Back Right Spinning Wheel      [BRSW_T]
-    Back Left Spinning Wheel       [BLSW_T]
+    Right Turning Wheel                 [RTW_T]
+    Left Turning Wheel                  [LTW_T]
+    Right Spinning Wheel                [RSW_T]
+    Left Spinning Wheel                 [LSW_T]
+    Back Right Spinning Wheel           [BRSW_T]
+    Back Left Spinning Wheel            [BLSW_T]
+
+Physics Params:
+    Wheels (Kp Kd mu1 mu2 etc.)
     
 -->
 
@@ -47,24 +42,30 @@ Transmissions:
 <property name="M_PI" value="3.1415926535897931" />
 <property name="inch" value="0.0254"/>
 
-<!-- Kinect Camera Module specific properties for pose -->
-<property name="cam_px" value="-0.087" />
-<property name="cam_py" value="-0.0125" /> 
-<property name="cam_pz" value="0.2870" />
-<property name="cam_or" value="0" />
-<property name="cam_op" value="0" />
-<property name="cam_oy" value="0" />
-
 <!-- List of Editable Walker Dimensions-->
 <property name="forward_leg_extension" value="${4*inch}" />
 <property name="backwards_leg_extension" value="${4*inch}" />
 <property name="frame_width" value="${3*inch}" />
 <property name="handle_width" value="${3*inch}" />
-<property name="handle_height" value="${5*inch}" />
+<property name="extrusion_length" value="0.038" />
+<property name="axle_track" value="${15*inch}" />
+
+<!-- Just defining wheel base is one thing, however in order to define
+     The position of each wheel w.r.t the position of the core, one must
+     Define both forward and backward wheel extension, and they add up to wheel base
+     Here we define wheel base and backward wheel extension, forward is implicitly defined -->
+
+<property name="wheel_base" value="0.5" />
+<property name="front_wheel_extension" value="0" />
+
+<property name="handle_track" value="${20*inch}" />
+<property name="handle_height" value="${43*inch}" />
+<property name="core_width" value="${0.25431 * 2}" />
 
 <!--    Gazebo Ros Control Plugin
         Allows us to generate controllers for joints
         Controllers will be nodes within the /walkernew namespace    -->
+
 <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
         <robotNamespace>/walkernew</robotNamespace>
@@ -72,772 +73,338 @@ Transmissions:
     </plugin>
 </gazebo>
 
-<!-- Base Footprint [BFP_L]-->
+<!-- Base Coordinate Systems    :   [BCS]    -->
 <link name="base_footprint">
     <origin xyz="0 0 0" rpy="0 0 0" />
 </link>
 
+<property name="base_link_height_offset" value="${21.25 * inch}" />
 <joint name="base_joint" type="fixed">
     <parent link="base_footprint"/>
-    <child link="core"/>
-    <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
+    <child link="base_link"/>
+    <origin xyz="0 0 ${base_link_height_offset}" rpy="0 0 0" />
 </joint>
 
-<!-- Core (Base Link) [CORE_L] -->
-<link name="core">
-    <visual>
-        <origin xyz="0 0 ${31*inch}" rpy="${M_PI/2} ${3*M_PI/2} 0" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/Core Revised.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin xyz="0 0 ${31*inch}" rpy="${M_PI/2} ${3*M_PI/2} 0" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/Core Revised.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <origin xyz="0 0.2 -0.2" rpy="0 0 0" />
-        <mass value="7.6"/>
-        <inertia ixx="0.91" ixy="0" ixz="0" iyy="0.47" iyz="-0.37" izz="0.46"/>
-    </inertial>
-</link>
-
-<!-- Front Left Leg - [FLL_L] -->
-<link name="front_left_leg">
-    <visual>
-        <origin xyz="${(-27*inch)-forward_leg_extension} ${-1.6*inch} ${(14.63+1.75)*inch}" rpy="${M_PI/2+0.12} 0 ${-M_PI/2-0.06}" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/Left Front Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin xyz="${(-27*inch)-forward_leg_extension} ${-1.6*inch} ${(14.63+1.75)*inch}" rpy="${M_PI/2+0.12} 0 ${-M_PI/2-0.06}" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/Left Front Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <origin xyz="-0.22 -0.13 0.14" rpy="0 0 0" />
-        <mass value="2.04"/>
-        <inertia ixx="0.08" ixy="-0.06" ixz="0.07" iyy="0.18" iyz="-0.04" izz="0.17"/>
-    </inertial>
-</link>
-
-<!-- Back Left Leg - [BLL_L] -->
-<link name="back_left_leg">
-    <visual>
-        <origin xyz="${backwards_leg_extension} 0 ${17.8*inch}" rpy="0.025 0.41 ${M_PI/2}" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/Back Left Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin xyz="0 0 ${17.8*inch}" rpy="0.025 0.41 ${M_PI/2}" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/Back Left Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <origin xyz="-0.09 0.01 -0.08" rpy="0 0 0" />
-        <mass value="2.11"/>
-        <inertia ixx="0.04" ixy="0" ixz="0" iyy="0.07" iyz="0" izz="0.04"/>
-    </inertial>
-</link>
-
-<!-- Core to Left Leg [CTLL_L] -->
-<link name="core_to_leg_left">
-    <visual>
-        <origin xyz="0 0 ${18.35*inch}" rpy="${M_PI/2} 0 0" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/CoreToLeg.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin xyz="0 0 ${18.35*inch}" rpy="${M_PI/2} 0 0" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/CoreToLeg.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <origin xyz="0 -0.01 -0.13" rpy="0 0 0" />
-        <mass value="1.56"/>
-        <inertia ixx="0.04" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0"/>
-    </inertial>
-</link>
-
-<!-- Front Left Leg to Back Leg [FLLTBL_L] -->
-<joint name="front_left_leg_to_back_leg" type="fixed">
-    <parent link="front_left_leg"/>
-    <child link="back_left_leg"/>
-    <origin xyz="${-6.75*inch-forward_leg_extension+backwards_leg_extension} ${3.9*inch} 0"/>
-</joint>
-
-
-<joint name="core_to_leg_left_to_front_leg" type="fixed">
-    <parent link="core_to_leg_left"/>
-    <child link="front_left_leg"/>
-    <origin xyz="${25*inch} ${6.05*inch} 0"/>
-  </joint>
-
-<joint name="core_to_core_to_leg_left" type="fixed">
-    <parent link="core"/>
-    <child link="core_to_leg_left"/>
-    <origin xyz="${0.65*inch} ${-4*inch-(frame_width/2)} 0"/>
-  </joint>
-
-<!-- Handle Bottom Left - [HBL_L] -->
-<link name="handle_bottom_left">
-    <visual>
-        <origin xyz="0 0 ${21.75*inch}" rpy="${M_PI/2} 0 0" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/HandleBottom.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin xyz="0 0 ${21.75*inch}" rpy="${M_PI/2} 0 0" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/HandleBottom.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <origin xyz="0 0.07 0.09" rpy="0 0 0" />
-        <mass value="0.5"/>
-        <inertia ixx="0.06" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0.02"/>
-    </inertial>
-</link>
-
-<joint name="core_to_bottom_handle_left" type="fixed">
-    <parent link="core"/>
-    <child link="handle_bottom_left"/>
-    <origin xyz="${0.7*inch} ${-2*inch-(handle_width/2)} 0"/>
-  </joint>
-
-<!-- Handle Left - [HL_L] -->
-<link name="handle_left">
-  <visual>
-    <origin xyz="0 0 ${13.75*inch+handle_height}" rpy="${M_PI/2} 0 ${3*M_PI/2}" />
-    <geometry>
-     <mesh filename="package://simplified/meshes/Handle Revised.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
- </visual>
-    <collision>
-   <origin xyz="0 0 ${13.75*inch+handle_height}" rpy="${M_PI/2} 0 ${3*M_PI/2}" />
-    <geometry>
-     <mesh filename="package://simplified/meshes/Handle Revised.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
-    </collision>
-    <inertial>
-    <origin xyz="0.02 0.44 0.04" rpy="0 0 0" />
-      <mass value="2.21"/>
-      <inertia ixx="0.48" ixy="0.02" ixz="0" iyy="0.02" iyz="0.02" izz="0.46"/>
-    </inertial>
- </link>
-
-<joint name="handle_bottom_left_to_handle" type="fixed">
-    <parent link="handle_bottom_left"/>
-    <child link="handle_left"/>
-    <origin xyz="${1.5*inch} ${1.5*inch} 0"/>
-  </joint>
-
-<!-- Core to Leg Right - [CTLR_L] -->
-<link name="core_to_leg_right">
-    <visual>
-        <origin xyz="0 0 ${18.35*inch}" rpy="${3*M_PI/2} ${M_PI} 0" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/CoreToLeg.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin xyz="0 0 ${18.35*inch}" rpy="${3*M_PI/2} ${M_PI} 0" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/CoreToLeg.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <origin xyz="0 -0.11 -0.02" rpy="0 0 0" />
-        <mass value="1.56"/>
-        <inertia ixx="0.03" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.3"/>
-    </inertial>
-</link>
-
-
-<joint name="core_to_core_to_leg_right" type="fixed">
-    <parent link="core"/>
-    <child link="core_to_leg_right"/>
-    <origin xyz="${0.65*inch} ${20*inch+(frame_width/2)} 0"/>
-  </joint>
-
-<!-- Handle Bottom Right - [HBR_L] -->
-<link name="handle_bottom_right">
-    <visual>
-        <origin xyz="0 0 ${21.75*inch}" rpy="${3*M_PI/2} ${M_PI} 0" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/HandleBottom.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin xyz="0 0 ${21.75*inch}" rpy="${3*M_PI/2} ${M_PI} 0" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/HandleBottom.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <origin xyz="0 -0.07 0.09" rpy="0 0 0" />
-        <mass value="2.03"/>
-        <inertia ixx="0.06" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0.02"/>
-    </inertial>
-</link>
-
-<joint name="core_to_bottom_handle_right" type="fixed">
-    <parent link="core"/>
-    <child link="handle_bottom_right"/>
-    <origin xyz="${0.75*inch} ${18*inch+(handle_width/2)} 0"/>
-  </joint>
-
-<!-- Handle Right - [HR_L] -->
-<link name="handle_right">
-    <visual>
-        <origin xyz="0 0 ${13.75*inch+handle_height}" rpy="${M_PI/2} 0 ${3*M_PI/2}" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/Handle Revised.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin xyz="0 0 ${13.75*inch+handle_height}" rpy="${M_PI/2} 0 ${3*M_PI/2}" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/Handle Revised.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <origin xyz="0.02 0.44 0.04" rpy="0 0 0" />
-        <mass value="2.21"/>
-        <inertia ixx="0.48" ixy="0.02" ixz="0" iyy="0.02" iyz="0.02" izz="0.46"/>
-    </inertial>
-</link>
-
-<joint name="handle_bottom_right_to_handle" type="fixed">
-    <parent link="handle_bottom_right"/>
-    <child link="handle_right"/>
-    <origin xyz="${1.5*inch} ${0*inch} 0"/>
-  </joint>
-
-<!-- Front Right Leg - [FRL_L] -->
-<link name="front_right_leg">
-    <visual>
-        <origin xyz="${2.75*inch-forward_leg_extension} ${0*inch} ${(14.63+1.75)*inch}" rpy="${M_PI/2+0.12} 0 ${-M_PI/2-0.06}" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/Right Front Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin xyz="${2.75*inch-forward_leg_extension} ${0*inch} ${(14.63+1.75)*inch}" rpy="${M_PI/2+0.12} 0 ${-M_PI/2-0.06}" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/Right Front Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <origin xyz="0.22 -0.14 0.14" rpy="0 0 0"/>
-        <mass value="2.04"/>
-        <inertia ixx="0.08" ixy="-0.06" ixz="0.07" iyy="0.18" iyz="-0.04" izz="0.18"/>
-    </inertial>
-</link>
-
-<joint name="core_to_leg_right_to_front_leg" type="fixed">
-    <parent link="core_to_leg_right"/>
-    <child link="front_right_leg"/>
-    <origin xyz="${-5*inch} ${-1.5*inch} 0"/>
-  </joint>
-<joint name="front_right_leg_to_back_leg" type="fixed">
-    <parent link="front_right_leg"/>
-    <child link="back_right_leg"/>
-    <origin xyz="${23*inch-forward_leg_extension+backwards_leg_extension} ${4.1*inch} 0"/>
-  </joint>
-
-<!-- Back Right Leg - [BRL_L] -->
-<link name="back_right_leg">
-    <visual>
-        <origin xyz="${backwards_leg_extension} 0 ${17.8*inch}" rpy="0.025 0.41 ${M_PI/2}" />
-        <geometry>
-         <mesh filename="package://simplified/meshes/Right Back Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin xyz="0 0 ${17.8*inch}" rpy="0.025 0.41 ${M_PI/2}" />
-        <geometry>
-         <mesh filename="package://simplified/meshes/Right Back Leg Revised 2.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <origin xyz="-0.09 0.03 -0.08" rpy="0 0 0" />
-        <mass value="2.11"/>
-        <inertia ixx="0.04" ixy="-0.01" ixz="0" iyy="0.07" iyz="0" izz="0.04"/>
-    </inertial>
-</link>
-
-<joint name="back_right_leg_to_wheel" type="continuous">
-    <parent link="back_right_leg"/>
-    <child link="back_right_spinning_wheel"/>
-    <axis xyz="0 1 0"/>
-    <origin xyz="${-0.07+backwards_leg_extension} -0.15 ${4*inch}"/>
-    <limit effort="100" velocity="100"/>
-      <joint_properties damping="0.1" friction="0.5"/>
-  </joint>
-
-<!-- Back Right Spinning Wheel - [BRSW_L] -->
-<link name="back_right_spinning_wheel">
-    <visual>
-        <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <origin xyz="0 0 0" rpy="0 0 0" />
-        <mass value="2.28"/>
-        <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.01"/>
-    </inertial>
-</link>
-
-<joint name="back_left_leg_to_wheel" type="continuous">
-    <parent link="back_left_leg"/>
-    <child link="back_left_spinning_wheel"/>
-    <axis xyz="0 1 0"/>
-    <origin xyz="${-2.5*inch+backwards_leg_extension} ${-6*inch} ${4*inch}"/>
-    <limit effort="100" velocity="100"/>
-      <joint_properties damping="0.1" friction="0.5"/>
-  </joint>
-
-<!-- Back Left Spinning Wheel - [BLSW_L] -->
-<link name="back_left_spinning_wheel">
-    <visual>
-        <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <origin xyz="0 0 0" rpy="0 0 0" />
-        <mass value="2.28"/>
-        <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.01"/>
-    </inertial>
-</link>
-
-<!-- Front Wheel Yaw Joint Params -->
-<xacro:property name="front_yaw_effort_limit" value="100.0"/>
-<xacro:property name="front_yaw_velocity_limit" value="100.0"/>
-<xacro:property name="front_yaw_damping" value="0.5"/>
-<xacro:property name="front_yaw_friction" value="0.0"/>
-
-<joint name="front_right_leg_to_turning_wheel" type="continuous">
-    <parent link="front_right_leg"/>
-    <child link="front_right_turning_wheel"/>
-    <origin xyz="${4.25*inch-forward_leg_extension} ${-2.4*inch} ${10*inch}"/>
-    <axis xyz="0 0 1"/>
-    <limit effort="${front_yaw_effort_limit}" velocity="${front_yaw_velocity_limit}"  />
-    <joint_properties damping="${front_yaw_damping}" friction="${front_yaw_friction}"/>
-</joint>
-
-<joint name="front_left_leg_to_turning_wheel" type="continuous">
-    <parent link="front_left_leg"/>
-    <child link="front_left_turning_wheel"/>
-    <axis xyz="0 0 1"/>
-    <origin xyz="${-25.50*inch-forward_leg_extension} ${-2.4*inch} ${10*inch}"/>
-    <limit effort="${front_yaw_effort_limit}" velocity="${front_yaw_velocity_limit}"  />
-    <joint_properties damping="${front_yaw_damping}" friction="${front_yaw_friction}"/>
-</joint>
-
-<!-- Front Right Turning Wheel - [FRTW_L] -->
-<link name="front_right_turning_wheel">
-  <visual>
-    <origin xyz="0 0 0" rpy="0 ${M_PI/2-0.06} 0" />
-    <geometry>
-     <mesh filename="package://simplified/meshes/frontwheelhub.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
- </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 ${M_PI/2-0.06} 0" />
-      <geometry>
-         <mesh filename="package://simplified/meshes/frontwheelhub.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <mass value="0.79"/>
-      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0"/>
-    </inertial>
- </link>
-
-<!-- Front Left Turning Wheel - [FLTW_L] -->
-<link name="front_left_turning_wheel">
-  <visual>
-    <origin xyz="0 0 0" rpy="0 ${M_PI/2-0.06} 0" />
-    <geometry>
-     <mesh filename="package://simplified/meshes/frontwheelhub.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
- </visual>
-    <collision>
-    <origin xyz="0 0 0" rpy="0 ${M_PI/2-0.06} 0" />
-    <geometry>
-     <mesh filename="package://simplified/meshes/frontwheelhub.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
-    </collision>
-    <inertial>
+<link name="base_link">
     <origin xyz="0 0 0" rpy="0 0 0" />
-      <mass value="0.79"/>
-      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0"/>
-    </inertial>
- </link>
+</link>
 
-<!-- Front Wheel Rotational Joint Params -->
-<xacro:property name="front_rotational_effort_limit" value="100.0"/>
-<xacro:property name="front_rotational_velocity_limit" value="100.0"/>
-<xacro:property name="front_rotational_damping" value="0.1"/>
-<xacro:property name="front_rotational_friction" value="0.2"/>
-
-<joint name="front_right_turning_to_spinning" type="continuous">
-    <parent link="front_right_turning_wheel"/>
-    <child link="front_right_spinning_wheel"/>
-    <axis xyz="0 1 0"/>
-    <origin xyz="0.04558 ${0.65*inch} ${-6*inch}"/>
-    <limit effort="${front_rotational_effort_limit}" velocity="${front_rotational_velocity_limit}"  />
-    <joint_properties damping="${front_rotational_damping}" friction="${front_rotational_friction}"/>
-  </joint>
-
-<joint name="front_left_turning_to_spinning" type="continuous">
-    <parent link="front_left_turning_wheel"/>
-    <child link="front_left_spinning_wheel"/>
-    <axis xyz="0 1 0"/>
-    <origin xyz="0.04558 ${0.65*inch} ${-6*inch}"/>
-    <limit effort="${front_rotational_effort_limit}" velocity="${front_rotational_velocity_limit}"  />
-    <joint_properties damping="${front_rotational_damping}" friction="${front_rotational_friction}"/>
-  </joint>
-
-<!-- Front Right Spinning Wheel - [FRSW_L] -->
-<link name="front_right_spinning_wheel">
+<!-- It would be nice to import things like mass, Ixx Ixy, etc. from a yaml file, or some text file that could be fully or partially generated from solidworks... Unfortunately, there is no support for .yaml files in indigo, but there is in jade, and hopefully that feature will eventually be backported. If it is ever backported, look into grabbing those properties straight form a yaml file)-->
+<xacro:macro name="alink" params="linkName fileName transformXYZ transformRPY mass ixx ixy ixz iyy iyz izz">
+<link name="${linkName}">
     <visual>
-        <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
+        <origin xyz="${transformXYZ}" rpy="${transformRPY}"/>
         <geometry>
-            <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
+            <mesh filename="${fileName}" scale="0.001 0.001 0.001"/>
         </geometry>
     </visual>
     <collision>
-        <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
+        <origin xyz="${transformXYZ}" rpy="${transformRPY}"/>
         <geometry>
-            <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
+            <mesh filename="${fileName}" scale="0.001 0.001 0.001"/>
         </geometry>
     </collision>
     <inertial>
-        <origin xyz="0.04558 0 0" rpy="0 0 0" />
-        <mass value="2.28"/>
-        <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.01"/>
+		<origin xyz="${transformXYZ}" rpy="${transformRPY}"/>
+        <mass value="${mass}"/>
+        <inertia ixx="${ixx}" ixy="${ixy}" ixz="${ixz}" iyy="${iyy}" iyz="${iyz}" izz="${izz}" />
     </inertial>
 </link>
+</xacro:macro>
 
-<!-- Front Left Spinning Wheel - [FLSW_L] -->
-<link name="front_left_spinning_wheel">
-    <visual>
-    <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
-    <geometry>
-        <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
-    </geometry>
-    </visual>
-    <collision>
-        <origin xyz="0 0 0" rpy="0 0 0" />
-        <geometry>
-            <mesh filename="package://simplified/meshes/wheel.STL" scale="0.001 0.001 0.001"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <origin xyz="0.04558 0 0" rpy="0 0 0" />
-        <mass value="2.28"/>
-        <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.01"/>
-    </inertial>
-</link>
+<xacro:macro name="transmissionMacro" params="tName jointName type">
+<transmission name="${tName}">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="${jointName}">
+        <hardwareInterface>${type}JointInterface</hardwareInterface>
+    </joint>
+    <actuator name="${tName}_actuator">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>${type}JointInterface</hardwareInterface>
+    </actuator>
+</transmission> 
+</xacro:macro>
 
-<gazebo reference="front_right_turning_wheel">
-    <mu1>0.1</mu1>
-    <mu2>0.1</mu2>
-    <material>Gazebo/Black</material>
-    <gravity>true</gravity>
-    <provideFeedback>true</provideFeedback>
-</gazebo>
+<!-- Core   :   [CORE]  -->
+<joint name="link_to_core" type="fixed">
+    <parent link="base_link"/>
+    <child link="core"/>
+    <origin xyz="0 ${-0.5 * core_width} 0" rpy="0 0 0" />
+</joint>
 
-<gazebo reference="front_left_turning_wheel">
-    <mu1>0.1</mu1>
-    <mu2>0.1</mu2>
-    <material>Gazebo/Black</material>
-    <gravity>true</gravity>
-    <provideFeedback>true</provideFeedback>
-</gazebo>
+<xacro:alink 
+    linkName="core"
+    fileName="package://simplified/meshes/Core.STL"
+    transformXYZ="0.02504 ${0.5 * core_width} 0.01849"
+    transformRPY="0 0 0"
+    mass="7.6"
+    ixx="0.91" ixy="0" ixz="0" iyy="0.47" iyz="-0.37" izz="0.46"
+/>
 
-<!-- Front Wheel Rotational Joint Params -->
-<xacro:property name="wheel_mu1" value="0.99"/>
-<xacro:property name="wheel_mu2" value="0.90"/>
-<xacro:property name="wheel_kp" value="1000000"/>
-<xacro:property name="wheel_kd" value="500000"/>
-<xacro:property name="wheel_damping" value="0.10"/>
+<!-- Track Extenders    :   [TR_EX] -->
+<property name="track_extender_wheel_offset" value="${2.7*inch}" /> 
+<property name="track_extender_padding_thickness" value="0.00955" />
 
-<gazebo reference="front_left_spinning_wheel">
-    <mu1>${wheel_mu1}</mu1>
-    <mu2>${wheel_mu2}</mu2>
-    <kp>${wheel_kp}</kp>
-    <kd>${wheel_kd}</kd>
-    <fdir1>1 0 0</fdir1>
-    <gravity>true</gravity>
-    <dampingFactor>${wheel_damping}</dampingFactor>
-    <material>Gazebo/Blue</material>
-    <provideFeedback>true</provideFeedback>
-</gazebo>
+<xacro:macro name="trackExtender" params="prefix reflect rotate">
+<xacro:alink 
+    linkName="track_extender_${prefix}"
+    fileName="package://simplified/meshes/CoreToLeg.STL"
+    transformXYZ="-0.0057 ${0.06219 * reflect} 0.027"
+    transformRPY="0 0 ${rotate*M_PI}"
+    mass="1.56"
+    ixx="0.03" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.3"
+/>
+</xacro:macro>
+<xacro:trackExtender prefix="right" reflect =  "1" rotate="0"/>
+<xacro:trackExtender prefix="left"  reflect = "-1" rotate="1"/>
 
-<gazebo reference="front_right_spinning_wheel">
-    <mu1>${wheel_mu1}</mu1>
-    <mu2>${wheel_mu2}</mu2>
-    <kp>${wheel_kp}</kp>
-    <kd>${wheel_kd}</kd>
-    <fdir1>1 0 0</fdir1>
-    <gravity>true</gravity>
-    <dampingFactor>${wheel_damping}</dampingFactor>
-    <material>Gazebo/Red</material>
-    <provideFeedback>true</provideFeedback>
-</gazebo>
-
-<gazebo reference="back_right_spinning_wheel">
-    <mu1>${wheel_mu1}</mu1>
-    <mu2>${wheel_mu2}</mu2>
-    <kp>${wheel_kp}</kp>
-    <kd>${wheel_kd}</kd>
-    <fdir1>1 0 0</fdir1>
-    <gravity>true</gravity>
-    <dampingFactor>${wheel_damping}</dampingFactor>
-    <material>Gazebo/Black</material>
-    <provideFeedback>true</provideFeedback>
-</gazebo>
-
-<gazebo reference="back_left_spinning_wheel">
-    <mu1>${wheel_mu1}</mu1>
-    <mu2>${wheel_mu2}</mu2>
-    <kp>${wheel_kp}</kp>
-    <kd>${wheel_kd}</kd>
-    <fdir1>1 0 0</fdir1>
-    <gravity>true</gravity>
-    <dampingFactor>${wheel_damping}</dampingFactor>
-    <material>Gazebo/Black</material>
-    <provideFeedback>true</provideFeedback>
-</gazebo>
-
-<joint name="camera_rgb_joint" type="fixed">
-    <origin xyz="${cam_px+2*inch} ${cam_py+9*inch} ${cam_pz+22.5*inch}" rpy="${cam_or} ${cam_op} ${cam_oy+M_PI}"/>
+<joint name="core_to_right_track_extender" type="fixed">
     <parent link="core"/>
-    <child link="camera_rgb_frame" />
+    <child link="track_extender_right"/>
+    <origin xyz="0 ${-0.5 * (axle_track - core_width)} ${-2 * (track_extender_padding_thickness + extrusion_length)}"/>
 </joint>
 
-<link name="camera_rgb_frame"/>
-
-<joint name="camera_rgb_optical_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
-    <parent link="camera_rgb_frame" />
-    <child link="camera_rgb_optical_frame" />
+<joint name="core_to_left_track_extender" type="fixed">
+    <parent link="core"/>
+    <child link="track_extender_left"/>
+    <origin xyz="0 ${1 * core_width + 0.5 * (axle_track - core_width)} ${-2 * (track_extender_padding_thickness + extrusion_length)}"/>
 </joint>
 
-<!-- Camera RGB Optical Frame - [CROF_L] -->
-<link name="camera_rgb_optical_frame"/>
+<!-- Front Legs     :   [FR_LGS]    -->
+<property name="front_leg_length" value="0.399108" />
+<xacro:macro name="trackExtenderToFrontLegJoint" params="prefix">
+<joint name="track_extender_to_front_leg_${prefix}" type="fixed">
+    <parent link="track_extender_${prefix}"/>
+    <child link="front_${prefix}_leg"/>
+    <origin xyz="${0.2 + front_wheel_extension - front_leg_length} 0 0"/>
+</joint>
+</xacro:macro>
+<xacro:trackExtenderToFrontLegJoint prefix="right"/>
+<xacro:trackExtenderToFrontLegJoint prefix="left"/>
 
-<joint name="camera_joint" type="fixed">
-    <origin xyz="-0.031 ${-cam_py} -0.016" rpy="0 0 0"/>
-    <parent link="camera_rgb_frame"/>
-    <child link="camera_link"/>
-</joint> 
+<xacro:alink 
+    linkName="front_right_leg"
+    fileName="package://simplified/meshes/Left Front Leg.STL"
+    transformXYZ="0.22295 -0.00299 -0.03424"
+    transformRPY="0 0 ${M_PI / -2}"
+    mass="2.04"
+    ixx="0.08" ixy="-0.06" ixz="0.07" iyy="0.18" iyz="-0.04" izz="0.17"
+/>
 
-<!-- Camera Link - [CAM_L] -->
-<link name="camera_link">
-    <visual>
-        <origin xyz="0 0 0" rpy="0 0 ${M_PI/2}"/>
-        <geometry>
-            <mesh filename="package://turtlebot_description/meshes/sensors/kinect.dae"/>
-        </geometry>
-    </visual>
+<xacro:alink 
+    linkName="front_left_leg"
+    fileName="package://simplified/meshes/Right Front Leg.STL"
+    transformXYZ="0.22295 0.00299 -0.03424"
+    transformRPY="0 0 0"
+    mass="2.04"
+    ixx="0.08" ixy="-0.06" ixz="0.07" iyy="0.18" iyz="-0.04" izz="0.18"
+/>
 
-    <collision>
-        <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
-        <geometry>
-            <box size="0.07271 0.27794 0.073"/>
-        </geometry>
-    </collision>
+<!-- Back Legs      :   [BK_LGS] -->
+<property name="back_leg_length" value="0.300" />
+<property name="back_leg_tip_to_over_wheel_offset" value="0" />
 
-    <inertial>
-        <mass value="0.564" />
-        <origin xyz="0 0 0" />
-        <inertia ixx="0.003881243" ixy="0.0" ixz="0.0" iyy="0.000498940" iyz="0.0" izz="0.003879257" />
-    </inertial>
-</link>
+<xacro:macro name="frontToBackLegJoint" params="prefix">
+<joint name="${prefix}_front_to_back_leg" type="fixed">
+    <parent link="front_${prefix}_leg"/>
+    <child link="back_${prefix}_leg"/>
+    <origin xyz="${back_leg_length - (wheel_base - front_leg_length) - back_leg_tip_to_over_wheel_offset} 0 ${-1 * extrusion_length}"/>
+</joint>
+</xacro:macro>
+<xacro:frontToBackLegJoint prefix="right"/>
+<xacro:frontToBackLegJoint prefix="left"/>
 
-    <!-- The fixed joints & links below are usually published by static_transformers launched by the OpenNi launch 
-         files. However, for Gazebo simulation we need them, so we add them here.
-         (Hence, don't publish them additionally!) -->
-	<joint name="camera_depth_joint" type="fixed">
-	  <origin xyz="0 ${2 * -cam_py} 0" rpy="0 0 0" />
-	  <parent link="camera_rgb_frame" />
-	  <child link="camera_depth_frame" />
-	</joint>
-	<link name="camera_depth_frame"/>
+<xacro:alink 
+    linkName="back_right_leg"
+    fileName="package://simplified/meshes/Left Back Leg.STL"
+    transformXYZ="-0.1947 -0.00554 -0.06712"
+    transformRPY="0 0 ${M_PI/-2}"
+    mass="2.11"
+    ixx="0.04" ixy="0" ixz="0" iyy="0.07" iyz="0" izz="0.04"
+/>
 
-	<joint name="camera_depth_optical_joint" type="fixed">
-	  <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
-	  <parent link="camera_depth_frame" />
-	  <child link="camera_depth_optical_frame" />
-	</joint>
-	<link name="camera_depth_optical_frame"/>
+<xacro:alink 
+    linkName="back_left_leg"
+    fileName="package://simplified/meshes/Right Back Leg.STL"
+    transformXYZ="-0.1947 0.00554 -0.06712"
+    transformRPY="0 0 0"
+    mass="2.11"
+    ixx="0.04" ixy="0" ixz="0" iyy="0.07" iyz="0" izz="0.04"
+/>
 
-  <gazebo reference="camera_link">  
-    <sensor type="depth" name="camera">
-      <always_on>true</always_on>
-      <update_rate>20.0</update_rate>
-      <camera>
-        <horizontal_fov>${70.0*M_PI/180.0}</horizontal_fov>
-        <image>
-          <format>R8G8B8</format>
-          <width>1920</width>
-          <height>1080</height>
-        </image>
-        <clip>
-          <near>0.05</near>
-          <far>8.0</far>
-        </clip>
-      </camera>
-      <plugin name="kinect_camera_controller" filename="libgazebo_ros_openni_kinect.so">
-        <cameraName>camera</cameraName>
-        <alwaysOn>true</alwaysOn>
-        <updateRate>10</updateRate>
-        <imageTopicName>rgb/image_raw</imageTopicName>
-        <depthImageTopicName>depth_registered/image_raw</depthImageTopicName>
-        <pointCloudTopicName>depth_registered/points</pointCloudTopicName>
-        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
-        <depthImageCameraInfoTopicName>depth_registered/camera_info</depthImageCameraInfoTopicName>
-        <frameName>camera_depth_optical_frame</frameName>
-        <baseline>0.1</baseline>
-        <distortion_k1>0.0</distortion_k1>
-        <distortion_k2>0.0</distortion_k2>
-        <distortion_k3>0.0</distortion_k3>
-        <distortion_t1>0.0</distortion_t1>
-        <distortion_t2>0.0</distortion_t2>
-        <pointCloudCutoff>0.4</pointCloudCutoff>
-        <pointCloudCutoffMax>5.0</pointCloudCutoffMax>
-      </plugin>
-    </sensor>
-  </gazebo>
+<!-- Front Wheels           [FR_WLS]  -->
+<property name="front_wheel_rotation_joint_offset" value="0.000" />
+<property name="front_wheel_carriage_to_axle_z_offset" value ="-0.14" />
+<property name="front_wheel_carriage_to_axle_x_offset" value ="-0.075" />
 
+<xacro:macro name="frontwheelassembly" params="prefix reflect">
+<!-- Wheel Carriage (Yaw)-->
+<joint name="${prefix}_front_leg_to_wheel_carriage" type="continuous">
+    <parent link="front_${prefix}_leg"/>
+    <child link="front_${prefix}_wheel_carriage"/>
+    <origin xyz="${front_leg_length - front_wheel_rotation_joint_offset} ${0.02 * reflect} ${-0.15 - extrusion_length}"/>
+    <axis xyz="0 0 1" />
+    <limit effort="100.0" velocity="100.0"  />
+    <joint_properties damping="0.5" friction="0.01"/>    
+</joint>
 
-<!-- Transmissions
-   Parsed by Gazebo Ros Control Plugin
-   defines controllers for actuated joints
--->
-<!-- Right Turning Wheel Transmission - [RTW_T]-->
-<transmission name="right_turning_wheel">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="front_right_leg_to_turning_wheel">
-        <hardwareInterface>PositionJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="right_turning_actuator">
-        <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-</transmission>
+<xacro:alink 
+    linkName="front_${prefix}_wheel_carriage"
+    fileName="package://simplified/meshes/WheelAssembly.STL"
+    transformXYZ="-0.03285 0.00018 -0.04182"
+    transformRPY="0 0 0"
+    mass="2.03"
+    ixx="0.06" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0.02"
+/>
+<xacro:transmissionMacro 
+    tName="${prefix}_turning_wheel" 
+    jointName="${prefix}_front_leg_to_wheel_carriage" 
+    type="Position"
+/>
 
-<!-- Left Turning Wheel Transmission - [LTW_T]-->
-<transmission name="left_turning_wheel">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="front_left_leg_to_turning_wheel">
-        <hardwareInterface>PositionJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="left_turning_actuator">
-        <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-</transmission>
+<!-- Wheel (Forward/Backward Rotation)-->
+<joint name="front_${prefix}_carriage_to_wheel" type="continuous">
+    <parent link="front_${prefix}_wheel_carriage"/>
+    <child link="front_${prefix}_wheel"/>
+    <origin xyz="${front_wheel_carriage_to_axle_x_offset} 0 ${front_wheel_carriage_to_axle_z_offset}"/>
+    <limit effort="100.0" velocity="100.0"  />
+    <joint_properties damping="0.1" friction="0.2"/>
+    <axis xyz="0 1 0" />
+</joint>
 
-<!-- Right Spinning Wheel Transmission - [RSW_T]-->
-<transmission name="right_spinning_wheel">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="front_right_turning_to_spinning">
-        <hardwareInterface>VelocityJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="right_spinning_actuator">
-        <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-</transmission>
+<xacro:alink 
+    linkName="front_${prefix}_wheel"
+    fileName="package://simplified/meshes/wheel.STL"
+    transformXYZ="0 0 0"
+    transformRPY="0 0 0"
+    mass="2.03"
+    ixx="0.06" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0.02"
+/>
+<xacro:transmissionMacro 
+    tName="${prefix}_spinning_wheel" 
+    jointName="front_${prefix}_carriage_to_wheel" 
+    type="Velocity"
+/>
 
-<!-- Left Spinning Wheel Transmission - [LSW_T]-->
-<transmission name="left_spinning_wheel">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="front_left_turning_to_spinning">
-        <hardwareInterface>VelocityJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="left_spinning_actuator">
-        <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-</transmission>
+</xacro:macro>
 
-<!-- Back Right Spinning Wheel Transmission - [BRSW_T]-->
-<transmission name="back_right_spinning_wheel">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="back_right_leg_to_wheel">
-        <hardwareInterface>EffortJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="back_right_spinning_actuator">
-        <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-</transmission>
+<xacro:frontwheelassembly prefix="right" reflect="-1" />
+<xacro:frontwheelassembly prefix="left" reflect="1" />                      
 
-<!-- Back Left Spinning Wheel Transmission - [BLSW_T]-->
-<transmission name="back_left_spinning_wheel">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="back_left_leg_to_wheel">
-        <hardwareInterface>EffortJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="back_left_spinning_actuator">
-        <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-</transmission>
+<!-- Back Wheels [BK_WLS] -->
+<xacro:macro name="backwheel" params="prefix reflect">
+<joint name="back_${prefix}_leg_to_wheel" type="continuous">
+    <parent link="back_${prefix}_leg"/>
+    <child link="back_${prefix}_spinning_wheel"/>
+    <origin xyz="${-1 * back_leg_length} ${reflect * 0.02} -0.3"/>
+    <limit effort="100" velocity="100"/>
+    <joint_properties damping="0.1" friction="0.5"/>
+    <axis xyz="0 1 0" />
+</joint>
 
+<xacro:alink 
+    linkName="back_${prefix}_spinning_wheel"
+    fileName="package://simplified/meshes/wheel.STL"
+    transformXYZ="0 0 0"
+    transformRPY="0 0 0"
+    mass="2.03"
+    ixx="0.06" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0.02"
+/>
 
-  <!-- Wheel Encoders Plugins - [WENC_P]-->
-<gazebo>
-    <plugin name="rearLeftWheel_encoder_plugin" filename="libwheel_encoder_plugin.so">
-        <joint_name>back_left_leg_to_wheel</joint_name>
-        <ticks_per_revolution>400</ticks_per_revolution>
-        <topic_name>walkernew/rearLeftEncoder</topic_name>
-        <reverse_direction>1</reverse_direction>
-    </plugin>
-    <plugin name="rearRightWheel_encoder_plugin" filename="libwheel_encoder_plugin.so">
-        <joint_name>back_right_leg_to_wheel</joint_name>
-        <ticks_per_revolution>400</ticks_per_revolution>
-        <topic_name>walkernew/rearRightEncoder</topic_name>
-        <reverse_direction>1</reverse_direction>
-    </plugin>
-    <plugin name="frontLeftWheel_encoder_plugin" filename="libwheel_encoder_plugin.so">
-        <joint_name>front_left_leg_to_turning_wheel</joint_name>
-        <ticks_per_revolution>400</ticks_per_revolution>
-        <topic_name>walkernew/frontLeftEncoder</topic_name>
-        <reverse_direction>1</reverse_direction>
-    </plugin>
-    <plugin name="frontRightWheel_encoder_plugin" filename="libwheel_encoder_plugin.so">
-        <joint_name>front_right_leg_to_turning_wheel</joint_name>
-        <ticks_per_revolution>400</ticks_per_revolution>
-        <topic_name>walkernew/frontRightEncoder</topic_name>
-        <reverse_direction>1</reverse_direction>
-    </plugin>
+<xacro:transmissionMacro 
+    tName="back_${prefix}_spinning_wheel" 
+    jointName="back_${prefix}_leg_to_wheel" 
+    type="Effort"
+/>
+
+</xacro:macro>
+<xacro:backwheel prefix="right" reflect="-1"/>
+<xacro:backwheel prefix="left" reflect="1" />                       
+
+<!-- Handle Tracks [HN_TRS] -->
+
+<property name="handle_track_height" value="0.345459" />
+
+<joint name="core_to_right_handle_track" type="fixed">
+    <parent link="core"/>
+    <child link="right_handle_track"/>
+    <origin xyz="0 ${core_width / 2 - handle_track / 2} ${handle_track_height}"/>
+</joint>
+
+<xacro:alink 
+    linkName="right_handle_track"
+    fileName="package://simplified/meshes/Handle Bottom.STL"
+    transformXYZ="0 0.04906 -0.23033"
+    transformRPY="0 0 0"
+    mass="2.11"
+    ixx="0.04" ixy="0" ixz="0" iyy="0.07" iyz="0" izz="0.04"
+/>
+
+<joint name="core_to_left_handle_track" type="fixed">
+    <parent link="core"/>
+    <child link="left_handle_track"/>
+    <origin xyz="0 ${core_width / 2 + handle_track / 2} ${handle_track_height}"/>
+</joint>
+
+<xacro:alink 
+    linkName="left_handle_track"
+    fileName="package://simplified/meshes/Handle Bottom.STL"
+    transformXYZ="0 -0.04906 -0.23033"
+    transformRPY="0 0 ${M_PI}"
+    mass="2.11"
+    ixx="0.04" ixy="0" ixz="0" iyy="0.07" iyz="0" izz="0.04"
+/>                           
+
+<!-- Handles  [HNDLS] -->
+<property name="handle_track_offset_from_ground" value="${base_link_height_offset + handle_track_height}" />
+<xacro:macro name="handleLink" params="prefix">
+
+<joint name="${prefix}_handle_track_to_link" type="fixed">
+    <parent link="${prefix}_handle_track"/>
+    <child link="${prefix}_handle"/>
+    <origin xyz="${extrusion_length * 2} 0 ${handle_height - handle_track_offset_from_ground}"/>
+</joint>
+
+<xacro:alink 
+    linkName="${prefix}_handle"
+    fileName="package://simplified/meshes/HandleAssembly.STL"
+    transformXYZ="-0.06475 0 -0.15606"
+    transformRPY="0 0 0"
+    mass="2.03"
+    ixx="0.06" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0.02"
+/>
+</xacro:macro>
+<xacro:handleLink prefix="right" />
+<xacro:handleLink prefix="left" />
+
+<!-- Kinect Camera    [KNCT] -->
+<xacro:include filename="$(find simplified)/urdf/kinectCam.urdf.xacro"/>
+
+<!-- params cam_p* control position, cam_o* control orientation -->
+<xacro:sensor_kinect parent="core" 
+    cam_px="0.02" cam_py="${core_width / 2}" cam_pz="0.31"
+    cam_or="0" cam_op="0" cam_oy="0" />
+
+<!--        END OF LINKS / JOINTS
+            BEGINNING OF TRANSMISSIONS  & OTHER    -->
+
+<xacro:macro name="wheelRefs" params="refName">
+<gazebo reference="${refName}">
+    <mu1>0.99</mu1>
+    <mu2>0.9</mu2>
+    <kp>1000000</kp>
+    <kd>500000</kd>
+    <fdir1>1 0 0</fdir1>
+    <gravity>true</gravity>
+    <dampingFactor>0.10</dampingFactor>
+    <material>Gazebo/Black</material>
+    <provideFeedback>true</provideFeedback>
 </gazebo>
+</xacro:macro>
+
+<xacro:wheelRefs refName="front_left_spinning_wheel"/>
+<xacro:wheelRefs refName="front_right_spinning_wheel"/>
+<xacro:wheelRefs refName="back_right_spinning_wheel"/>
+<xacro:wheelRefs refName="back_left_spinning_wheel"/> 
 
 </robot>

@@ -26,11 +26,7 @@ public:
     std_msgs::Float64 rightLinearSpeed;
     std_msgs::Float64 rightTurnAngle;
     
-    /* We supply the controllers the speeds of the front wheels with the (negated*) angular velocity
-       *negated, since for whatever reason the controller/orientation of joints works out this way 
-        TODO: evaluate whether to flip controller to take positive angular velocity, then remove negation here
-      First we compute wheel characteristics
-    */
+
     /* TODO: these constants depend on walker configuration, which is editable.
              thus this info should be broadcast somehow over ros master (rosparam server)
              and then retrieved by this node
@@ -42,20 +38,22 @@ public:
 
     //output variables, passed in as pointer, aka by reference
     double frontRightAngularSpeed, frontRightAngle, frontLeftAngularSpeed, frontLeftAngle;
+
+    /*   First we compute wheel characteristics    */
     calc_wheel_characteristics(
       WHEEL_RADIUS, WHEEL_BASE, REAR_TRACK, FRONT_TRACK, twist.linear.x, twist.angular.z,
       &frontRightAngularSpeed, &frontRightAngle, &frontLeftAngularSpeed, &frontLeftAngle
       );
-     leftLinearSpeed.data = -1.0 * frontLeftAngularSpeed; 
-     leftTurnAngle.data = frontLeftAngle;    			 
-     rightLinearSpeed.data = -1.0 * frontRightAngularSpeed;
-     rightTurnAngle.data = frontRightAngle;
-    //Note: Controllers actually take the inverse of angular speed for wheel turning
+
+    leftLinearSpeed.data = frontLeftAngularSpeed;
+    leftTurnAngle.data = frontLeftAngle;
+    rightLinearSpeed.data = frontRightAngularSpeed;
+    rightTurnAngle.data = frontRightAngle;
+
     left_spin_.publish(leftLinearSpeed);
-    left_turn_.publish(leftTurnAngle);	
+    left_turn_.publish(leftTurnAngle);
     right_spin_.publish(rightLinearSpeed);
     right_turn_.publish(rightTurnAngle);
-//    ROS_INFO("rearLeftVelocity: %f, rearRightVelocity: %f \n", frontLeftAngularSpeed, frontRightAngularSpeed);
   }
 
 private:

@@ -6,20 +6,20 @@ walkernew:
   # Velocity Controllers ---------------------------------------
   right_spinning_wheel_controller:
     type: velocity_controllers/JointVelocityController
-    joint: front_right_turning_to_spinning
+    joint: front_right_carriage_to_wheel
     pid: {p: 100, i: 0.01, d: 10}
   left_spinning_wheel_controller:
     type: velocity_controllers/JointVelocityController
-    joint: front_left_turning_to_spinning
+    joint: front_left_carriage_to_wheel
     pid: {p: 100, i: 0.01, d: 10}
   # Position Controllers ---------------------------------------
   left_turning_wheel_controller:
     type: position_controllers/JointPositionController
-    joint: front_left_leg_to_turning_wheel
+    joint: left_front_leg_to_wheel_carriage
     pid: {p: 2, i: 0.01, d: 0.5}
   right_turning_wheel_controller:
     type: position_controllers/JointPositionController
-    joint: front_right_leg_to_turning_wheel
+    joint: right_front_leg_to_wheel_carriage
     pid: {p: 2, i: 0.01, d: 0.5}
   back_left_turning_wheel_controller:
     type: effort_controllers/JointEffortController
@@ -29,3 +29,6 @@ walkernew:
     type: effort_controllers/JointEffortController
     joint: back_right_leg_to_wheel
     pid: {p: 100, i: 0.01, d: 10}
+
+
+

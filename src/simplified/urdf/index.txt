@@ -1,0 +1,81 @@
+The following is an index of all the xml nodes specified in urdf
+
+Property List:
+    Constants
+    Walker Configuration Dimensions
+
+Plugins:
+    Gazebo Ros Controls
+    Wheel Encoder
+
+Links & Joints:
+    Base Coordinate Systems
+        base_footprint
+        base_link
+        base_joint
+    Core
+        core
+        link_to_core
+    Track Extenders
+        track_extender_left
+        track_extender_right
+        core_to_left_track_extender
+        core_to_right_track_extender
+    Front Legs
+        front_left_leg
+        front_right_leg
+        track_extender_to_front_leg_left
+        track_extender_to_front_leg_right
+    Back Legs
+        back_left_leg
+        back_right_leg
+        left_front_to_back_leg
+        right_front_to_back_leg
+    Front Wheel Assemblies
+        front_left_wheel_carriage
+        front_left_wheel
+        front_right_wheel_carriage
+        front_right_wheel        
+        left_front_leg_to_wheel_carriage
+        front_left_carriage_to_wheel
+        right_front_leg_to_wheel_carriage
+        front_right_carriage_to_wheel
+    Back Wheels
+        back_left_spinning_wheel
+        back_right_spinning_wheel
+        back_left_leg_to_wheel
+        back_right_leg_to_wheel
+    Handle Tracks
+        left_handle_track
+        right_handle_track
+        core_to_left_handle_track
+        core_to_right_handle_track
+    Handles
+        left_handle
+        left_handle_track_to_link
+        right_handle
+        right_handle_track_to_link
+    Kinect Camera
+        camera_rgb_joint
+        camera_rgb_frame
+        camera_rgb_optical_joint
+        camera_rgb_optical_frame
+        camera_joint
+        camera_link
+        camera_depth_joint
+        camera_depth_frame
+        camera_depth_optical_joint
+        camera_depth_optical_frame
+
+Transmissions:
+    Right Turning Wheel                     [RTW_T]
+    Left Turning Wheel                      [LTW_T]
+    Right Spinning Wheel                    [RSW_T]
+    Left Spinning Wheel                     [LSW_T]
+    Back Right Spinning Wheel               [BRSW_T]
+    Back Left Spinning Wheel                [BLSW_T]
+
+Physics Params:
+    Wheels (Kp Kd mu1 mu2 etc.)
+    
+-->
